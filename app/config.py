@@ -10,15 +10,14 @@ class Settings:
     
     # Gemini AI Studio Settings
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "").strip()
-    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip()
     # Cascading failover list ranked from best/fastest to most reliable backup
     GEMINI_FALLBACK_MODELS: list[str] = [
-        "gemini-3.5-flash-lite",  # Rank 1: Ultra-fast 1.7s, highest availability, flawless Karakalpak
-        "gemini-2.0-flash",       # Rank 2: High intelligence, 1,500 req/day free quota
-        "gemini-2.0-flash-lite",  # Rank 3: Ultra-lightweight, high throughput
-        "gemini-2.5-flash",       # Rank 4: High-capacity Google flagship flash
-        "gemini-1.5-flash",       # Rank 5: Bulletproof legacy workhorse
-        "gemini-3.5-flash",       # Rank 6: Heavy neural fallback
+        "gemini-2.5-flash",       # Rank 1: High intelligence, high quota, perfectly accurate
+        "gemini-2.5-flash-lite",  # Rank 2: Ultra-fast, high throughput
+        "gemini-flash-latest",    # Rank 3: Latest Google flash endpoint
+        "gemini-3.5-flash-lite",  # Rank 4: Ultra-fast 3.x
+        "gemini-3.5-flash",       # Rank 5: Heavy neural fallback
     ]
     
     # Dictionary Settings

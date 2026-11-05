@@ -110,17 +110,18 @@ KARAKALPAK_SYSTEM_PROMPT = get_karakalpak_system_prompt()
 
 # Multi-tier Model Priority Cascade (Ranked from Best/Fastest to Most Reliable Backup)
 RANKED_MODEL_CASCADE = [
-    "gemini-3.5-flash-lite",  # Rank 1: Ultra-fast, high quota, flawless Karakalpak grammar
-    "gemini-2.0-flash-lite",  # Rank 2: Ultra-lightweight, 1.6s latency, high throughput
-    "gemini-2.0-flash",       # Rank 3: High intelligence, 1,500 req/day free tier quota
-    "gemini-2.5-flash",       # Rank 4: Google flagship flash
+    "gemini-2.5-flash",       # Rank 1: High intelligence, high quota, perfectly accurate
+    "gemini-2.5-flash-lite",  # Rank 2: Ultra-fast, high throughput
+    "gemini-flash-latest",    # Rank 3: Latest Google flash endpoint
+    "gemini-3.5-flash-lite",  # Rank 4: Ultra-fast 3.x
     "gemini-3.5-flash",       # Rank 5: Heavy neural fallback
 ]
 
 MODEL_ALIASES = {
-    "auto": "gemini-3.5-flash-lite",
-    "default": "gemini-3.5-flash-lite",
-    "gemini-2.5-flash-lite": "gemini-3.5-flash-lite",
+    "auto": "gemini-2.5-flash",
+    "default": "gemini-2.5-flash",
+    "gemini-2.0-flash": "gemini-2.5-flash",
+    "gemini-2.0-flash-lite": "gemini-2.5-flash-lite",
 }
 
 class KarakalpakTranslator:

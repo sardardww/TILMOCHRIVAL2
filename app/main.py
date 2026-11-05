@@ -93,6 +93,25 @@ async def list_available_models():
         return {"error": str(e)}
 
 
+@app.post("/debug/try_model", tags=["System"])
+async def debug_try_model(payload: TranslationRequest):
+    """Directly test a single model without any fallback cascade to see exact behavior."""
+    from google import genai
+    from google.genai import types
+    key = settings.GEMINI_API_KEY.strip()
+    if not key:
+        return {"error": "No API key"}
+    try:
+        client = genai.Client(api_key=key)
+        resp = client.models.generate_content(
+            model=payload.model or "gemini-2.5-flash",
+            contents=f"Translate into Karakalpak JSON: {payload.text}",
+        )
+        return {"status": "ok", "model": payload.model, "output": resp.text}
+    except Exception as e:
+        return {"status": "error", "model": payload.model, "error_type": type(e).__name__, "detail": str(e)}
+
+
 @app.post(
     "/translate",
     response_model=TranslationResponse,
