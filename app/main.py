@@ -78,6 +78,21 @@ async def health_check():
     )
 
 
+@app.get("/api/models", tags=["System"])
+async def list_available_models():
+    """List all available models returned directly by Google AI Studio."""
+    from google import genai
+    key = settings.GEMINI_API_KEY.strip()
+    if not key:
+        return {"error": "GEMINI_API_KEY not configured"}
+    try:
+        client = genai.Client(api_key=key)
+        models = [m.name for m in client.models.list()]
+        return {"available_models": models}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 @app.post(
     "/translate",
     response_model=TranslationResponse,
