@@ -101,16 +101,22 @@ ACADEMIC KARAKALPAK GRAMMAR GUIDE (Source: Qaraqalpaq tiliniń teoriyalıq gramm
 def fix_common_grammatical_slips(text: str) -> str:
     """
     Rule-based post-processor to correct common LLM morphophonemic slips
-    specifically documented in Qudaybergenov's Karakalpak Theoretical Grammar.
+    specifically documented in Qudaybergenov's Karakalpak Theoretical Grammar
+    and enforce Karakalpak over Kazakh false cognates.
     """
     replacements = [
-        # 1. 1st Person predicative after front vowels (intellektpin -> intellektpen)
+        # 1. Enforce Karakalpak 'jasama' over Kazakh 'jasandı'
+        (r"\bjasandı\b", "jasama"),
+        (r"\bjasandıq\b", "jasamalıq"),
+        (r"\bжасанды\b", "жасама"),
+        
+        # 2. 1st Person predicative after front vowels (intellektpin -> intellektpen)
         (r"\b([A-Za-zÁáÓóÚúǴǵŃńıI]*[eióúá][ptkqsxf])pin\b", r"\1pen"),
         (r"\b([A-Za-zÁáÓóÚúǴǵŃńıI]*[aıou][ptkqsxf])pin\b", r"\1pan"),
-        # 2. 1st person after sonorants/vowels
+        # 3. 1st person after sonorants/vowels
         (r"\b([A-Za-zÁáÓóÚúǴǵŃńıI]*[eióúá])mın\b", r"\1men"),
         (r"\b([A-Za-zÁáÓóÚúǴǵŃńıI]*[aıou])min\b", r"\1man"),
-        # 3. Common Russian-Karakalpak loanword predicatives
+        # 4. Common Russian-Karakalpak loanword predicatives
         ("intellektpin", "intellektpen"),
         ("intellektpın", "intellektpen"),
         ("mashinapın", "mashinaman"),
