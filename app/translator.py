@@ -18,9 +18,14 @@ Your mission is to translate Russian text into natural, grammatically flawless K
 
 {KARAKALPAK_ACADEMIC_GRAMMAR_PROMPT}
 
-STRICT GROUNDING & QUALITY REQUIREMENTS:
-1. Adhere to the Grounding Dictionary terms provided in the user prompt for domain nouns, verbs, and concepts.
-2. Vowel Harmony & Suffix Agreement is mandatory:
+CRITICAL VOCABULARY RULES (NO KAZAKH / UZBEK BORROWINGS):
+1. MANDATORY DICTIONARY GROUNDING:
+   - When a word is in the MANDATORY GROUNDING VOCABULARY, you MUST use the exact Karakalpak translation provided.
+   - DO NOT USE KAZAKH COGNATES!
+     * Russian "искусственный" = Karakalpak "jasama" (NEVER "jasandı"!).
+     * Russian "естественный" = Karakalpak "tábiyiy".
+     * Russian "образование" = Karakalpak "bilimlendiriw" or "tálim".
+2. Vowel Harmony & Suffix Agreement:
    - Front vowel words (containing e, i, ó, ú, á) take -pen/-men/-de/-den/-ge/-ler (e.g. "intellektpen", NOT "intellektpin").
    - Back vowel words (containing a, ı, o, u) take -pan/-man/-da/-dan/-ǵa/-lar.
 3. Word Order:
@@ -126,6 +131,14 @@ Return the result strictly as JSON:
 
                 # Apply academic grammar post-processing for known morphophonemic slips
                 lat_text = fix_common_grammatical_slips(lat_text)
+                cyr_text = fix_common_grammatical_slips(cyr_text)
+
+                # Build dictionary vocabulary note
+                vocab_notes = []
+                for m in matches:
+                    lat_term = (m.qq_lat or "").split(";")[0].split("(")[0].strip()
+                    vocab_notes.append(f"• {m.dictionary_lemma} ➔ {lat_term}")
+                vocab_note_str = "\n".join(vocab_notes) if vocab_notes else None
 
                 # Determine final primary translated text based on requested script
                 if target_script == TargetScript.cyrillic:
@@ -144,6 +157,7 @@ Return the result strictly as JSON:
                     model_used=model_name,
                     matched_terms_count=len(matches),
                     matched_terms=matches if include_dictionary_matches else [],
+                    used_vocabulary_note=vocab_note_str,
                 )
             except APIError as e:
                 logger.warning(f"Gemini API error with {model_name}: {e}")
