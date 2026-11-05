@@ -110,12 +110,11 @@ KARAKALPAK_SYSTEM_PROMPT = get_karakalpak_system_prompt()
 
 # Multi-tier Model Priority Cascade (Ranked from Best/Fastest to Most Reliable Backup)
 RANKED_MODEL_CASCADE = [
-    "gemini-3.5-flash-lite",  # Rank 1: Sub-2s latency, high quota, flawless Karakalpak grammar
-    "gemini-2.0-flash",       # Rank 2: High intelligence, 1,500 req/day free tier quota
-    "gemini-2.0-flash-lite",  # Rank 3: Ultra-lightweight, 1.6s latency, high throughput
+    "gemini-3.5-flash-lite",  # Rank 1: Ultra-fast, high quota, flawless Karakalpak grammar
+    "gemini-2.0-flash-lite",  # Rank 2: Ultra-lightweight, 1.6s latency, high throughput
+    "gemini-2.0-flash",       # Rank 3: High intelligence, 1,500 req/day free tier quota
     "gemini-2.5-flash",       # Rank 4: Google flagship flash
-    "gemini-1.5-flash",       # Rank 5: Bulletproof legacy workhorse
-    "gemini-3.5-flash",       # Rank 6: Heavy neural fallback
+    "gemini-3.5-flash",       # Rank 5: Heavy neural fallback
 ]
 
 MODEL_ALIASES = {
@@ -199,7 +198,7 @@ Return the result strictly as JSON:
                 # Generous 14.0s timeout per model so complex long paragraphs complete successfully
                 response = await asyncio.wait_for(
                     asyncio.to_thread(_call_model),
-                    timeout=14.0
+                    timeout=30.0
                 )
                 
                 raw_text = response.text.strip()
@@ -264,7 +263,7 @@ Return the result strictly as JSON:
                     used_vocabulary_note=vocab_note_str,
                 )
             except asyncio.TimeoutError:
-                logger.warning(f"Model {model_name} timed out after 14s, failing over to next model...")
+                logger.warning(f"Model {model_name} timed out after 30s, failing over to next model...")
                 last_error = f"{model_name} timed out"
                 continue
             except APIError as e:
@@ -276,14 +275,9 @@ Return the result strictly as JSON:
                 last_error = e
                 continue
 
-        # If all models in the cascade were rate-limited or busy, gracefully fallback to dictionary translation
-        logger.warning(f"All cascade models were busy or rate-limited ({last_error}). Providing graceful dictionary fallback.")
-        return self._build_quota_fallback_response(
-            text=text,
-            target_script=target_script,
-            matches=matches,
-            last_error=str(last_error)
-        )
+        # If all models in the cascade failed
+        logger.error(f"All Gemini models in cascade failed. Last error: {last_error}")
+        raise RuntimeError(f"Translation failed via AI Studio: {last_error}")
 
     def _parse_gemini_json(self, raw_text: str) -> dict:
         """Safely parse JSON response from Gemini, removing any accidental markdown fence."""
@@ -303,59 +297,6 @@ Return the result strictly as JSON:
                 "cyrillic": cyr_match.group(1) if cyr_match else "",
             }
 
-    def _build_quota_fallback_response(
-        self,
-        text: str,
-        target_script: TargetScript,
-        matches: list[DictionaryMatch],
-        last_error: str
-    ) -> TranslationResponse:
-        """
-        Graceful dictionary-grounded fallback when Google AI Studio free tier quotas are temporarily exceeded.
-        Ensures the API never returns an unhandled 500 error screen.
-        """
-        # Build dictionary-assisted translation
-        terms_map = {}
-        vocab_notes = []
-        for m in matches:
-            lat_term = (m.qq_lat or "").split(";")[0].split("(")[0].strip()
-            cyr_term = (m.qq_cyr or "").split(";")[0].split("(")[0].strip()
-            terms_map[m.source_word.lower()] = (lat_term, cyr_term)
-            vocab_notes.append(f"• {m.dictionary_lemma} ➔ {lat_term}")
-
-        words = text.split()
-        lat_words = []
-        cyr_words = []
-        for w in words:
-            clean = re.sub(r"[^\w\s-]", "", w).lower()
-            if clean in terms_map:
-                lat_words.append(terms_map[clean][0] or w)
-                cyr_words.append(terms_map[clean][1] or w)
-            else:
-                lat_words.append(w)
-                cyr_words.append(w)
-
-        lat_translated = " ".join(lat_words)
-        cyr_translated = " ".join(cyr_words)
-        vocab_note_str = "\n".join(vocab_notes) if vocab_notes else None
-
-        final_text = cyr_translated if target_script == TargetScript.cyrillic else (
-            f"Latin:\n{lat_translated}\n\nCyrillic:\n{cyr_translated}" if target_script == TargetScript.both else lat_translated
-        )
-
-        return TranslationResponse(
-            source_text=text,
-            corrected_source_text=None,
-            corrections_made=[],
-            translated_text=final_text,
-            translated_latin=lat_translated,
-            translated_cyrillic=cyr_translated,
-            target_script=target_script.value,
-            model_used="⚡ Dictionary Standby Mode (Google AI Studio kvotasi yangilanmoqda)",
-            matched_terms_count=len(matches),
-            matched_terms=matches,
-            used_vocabulary_note=vocab_note_str,
-        )
 
     def _build_unconfigured_response(
         self,
