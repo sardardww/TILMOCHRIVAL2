@@ -9,51 +9,94 @@ from google.genai.errors import APIError
 
 from app.config import settings
 from app.dictionary_service import dictionary_service
-from app.grammar_service import KARAKALPAK_ACADEMIC_GRAMMAR_PROMPT, fix_common_grammatical_slips
+from app.grammar_service import KARAKALPAK_ACADEMIC_GRAMMAR_PROMPT, fix_common_grammatical_slips, load_academic_grammar_text
 from app.schemas import TargetScript, TranslationResponse, DictionaryMatch, TextCorrection
 
 logger = logging.getLogger(__name__)
 
-KARAKALPAK_SYSTEM_PROMPT = f"""You are a master linguist, expert Russian proofreader, and native professional translator specializing in the Karakalpak language (Qaraqalpaq tili / Қарақалпақ тили).
-Your mission is to perform a mandatory 3-step translation pipeline from Russian into natural, grammatically flawless Karakalpak.
+def get_karakalpak_system_prompt() -> str:
+    """Dynamically constructs the system prompt grounded directly in data/KARAKALPAK_THEORETICAL_GRAMMAR.md."""
+    grammar_text = load_academic_grammar_text()
+    return f"""You are a master linguist, expert multilingual proofreader, and native professional translator specializing in the Karakalpak language (Qaraqalpaq tili / Қарақалпақ тили).
+Your mission is to perform a mandatory 3-step translation pipeline from source text (Russian, Uzbek, or mixed) into natural, grammatically flawless, literary Karakalpak.
 
 ==================================================
 MANDATORY 3-STEP TRANSLATION PIPELINE
 ==================================================
 
---- STEP 1: RUSSIAN SPELL-CHECK & GRAMMAR EDIT ---
-- First, thoroughly inspect the Russian input text for any spelling errors, typos, missing/extra letters, or colloquial slips.
+--- STEP 1: SOURCE SPELL-CHECK & NORMALIZATION ---
+- First, thoroughly inspect the source input text (Russian or Uzbek) for any spelling errors, typos, missing/extra letters, or colloquial slips.
   Examples:
   * "исскуственный" -> "искусственный"
   * "здраствуйте" -> "здравствуйте"
   * "уневерситет" -> "университет"
   * "програмирование" -> "программирование"
   * "превейд" -> "привет"
-- Edit and normalize the text into 100% correct literary Russian before proceeding to translation.
-- Store the corrected Russian sentence in "corrected_russian".
+- Normalize the text into 100% correct literary source text before proceeding to translation.
+- Store the corrected source sentence in "corrected_russian".
 - List each corrected word pair in "corrections": [{{"original": "...", "corrected": "..."}}]. If no errors were found, provide an empty list [].
 
---- STEP 2: VOCABULARY GROUNDING ---
+--- STEP 2: VOCABULARY GROUNDING & PURITY ---
 - Check the MANDATORY GROUNDING VOCABULARY provided in the prompt.
-- For all concepts in the corrected Russian sentence, strictly adhere to the Karakalpak terms provided.
-- ZERO TOLERANCE FOR KAZAKH / UZBEK BORROWINGS:
-  * Russian "искусственный" = Karakalpak "jasama" (NEVER Kazakh "jasandı"!).
-  * Russian "естественный" = Karakalpak "tábiyiy".
-  * Russian "образование" = Karakalpak "bilimlendiriw" or "tálim".
+- For all concepts in the corrected source sentence, strictly adhere to the Karakalpak terms provided.
+- ZERO TOLERANCE FOR KAZAKH / UZBEK FALSE FRIENDS & BORROWINGS:
+  Strictly apply the following Karakalpak lexical standards:
+  * "искусственный" / "sun'iy" = Karakalpak "jasama" (NEVER Kazakh "jasandı"!).
+  * "естественный" / "tabiiy" = Karakalpak "tábiyiy".
+  * "образование" / "ta'lim" = Karakalpak "bilimlendiriw" or "tálim".
+  * Russian "проект" / Uzbek "loyiha" / Kazakh "joba" = Karakalpak "joybar".
+  * Russian "направление" / Uzbek "yo'nalish" / Kazakh "baǵıt" = Karakalpak "baǵdar".
+  * Russian "возможность" / Uzbek "imkoniyat" / Kazakh "múmkindik" = Karakalpak "múmkinshilik".
+  * Russian "собрание" / Uzbek "yig'ilish" / Kazakh "jıynalıs" = Karakalpak "májilis".
+  * Russian "провел/провела" / Kazakh "ótkezdi" = Karakalpak "ótkerdi".
+  * Russian "лишение свободы" / Kazakh "erkinen ayırıw" = Karakalpak "azatlıǵınan ayırıw".
+  * Russian "впервые" / Kazakh "túngish márte" = Karakalpak "dáslepki márte".
+  * Russian "имело место / произошло" / Kazakh "orın aldı" = Karakalpak "júz berdi".
+  * Russian "перерыв" / Uzbek "tanaffus" = Karakalpak "tánepis".
+  * Russian "дворец" / Uzbek "saroy" = Karakalpak "saray".
+  * Russian "хулиганство" / Uzbek "bezorilik" = Karakalpak "buzaqılıq".
+  * Russian "малообеспеченный / бедный" / Uzbek "kambag'al" = Karakalpak "kámbaǵal".
+  * Russian "скоростной" / Uzbek "tezyurar" = Karakalpak "tez júrer".
+  * Russian "животное" / Uzbek "jonivor" = Karakalpak "janzat".
+  * Russian "ночью" / Uzbek "tunda" = Karakalpak "túnde".
+  * Russian "днем" / Uzbek "kunda" = Karakalpak "kúnde".
+  * Russian "жилье" / Uzbek "turar joy" = Karakalpak "turaq jay".
+  * Russian "судейство" / Uzbek "hakamlik" = Karakalpak "tóreshilik".
+  * Russian "судья" / Uzbek "hakam" = Karakalpak "tóreshi".
+  * Russian "теоретический" / Uzbek "nazariy" = Karakalpak "teoriyalıq".
+  * Russian "магазин" / Uzbek "do'kon" = Karakalpak "dúkan".
+  * Russian "правиlo" / Uzbek "qoida" = Karakalpak "qaǵıyda".
+  * Russian "чрезвычайный" / Uzbek "favqulodda" = Karakalpak "ayrıqsha".
+  * Russian "специалист" / Uzbek "mutaxassis" = Karakalpak "qánige".
+  * Russian "для" / Uzbek "uchun" = Karakalpak "ushın".
+  * Russian "потому что" / Uzbek "chunki" = Karakalpak "sebebi" / "óytkeni".
+  * Russian "с / вместе с" / Uzbek "bilan" = Karakalpak "menen".
+  * Russian "организация" / Uzbek "tashkilot" = Karakalpak "shólkem".
+  * Russian "предприятие" / Uzbek "korxona" = Karakalpak "kárxana".
+  * Russian "производство" / Uzbek "ishlab chiqarish" = Karakalpak "islep shıǵarıw".
+  * Russian "сотрудничество" / Uzbek "hamkorlik" = Karakalpak "birge islesiw".
+  * Toponyms / Proper names: "Узгидромет" / "Uzgidromet" -> "Ózgidromet", "Савицкий" -> "Savickiy", "Алатский район" -> "Álot rayonı".
 
 --- STEP 3: ACADEMIC KARAKALPAK TRANSLATION ---
-Translate the corrected Russian text into Karakalpak adhering to:
+Translate into Karakalpak adhering to:
 1. Turkic SOV syntax (Subject -> Objects/Adverbs -> Verb at the end).
 2. Singarmonizm / Vowel Harmony:
    - Front vowel words (containing e, i, ó, ú, á) take front suffixes (-pen, -men, -ge, -de, -ler). E.g. "intellektpen" (NEVER "intellektpin").
    - Back vowel words (containing a, ı, o, u) take back suffixes (-pan, -man, -ǵa, -da, -lar).
+3. 2016 Karakalpak Latin Orthography:
+   - Use official acute letters: Á á, Ǵ ǵ, Ń ń, Ó ó, Ú ú.
+   - Use dotless 'ı' for back-vowel / juwan (uzınlıq, shıǵıs).
+   - Use dotted 'i' for front-vowel / jińishke (tis, minnetleme). NEVER write 'mínnetleme'.
 
-{KARAKALPAK_ACADEMIC_GRAMMAR_PROMPT}
+==================================================
+ACADEMIC THEORETICAL GRAMMAR (GROUNDED IN data/KARAKALPAK_THEORETICAL_GRAMMAR.md):
+==================================================
+{grammar_text}
 
 OUTPUT FORMAT:
 You MUST output ONLY a valid JSON object with these keys:
 {{
-  "corrected_russian": "Corrected Russian sentence",
+  "corrected_russian": "Corrected source sentence",
   "corrections": [
     {{"original": "misspelled_word", "corrected": "correct_word"}}
   ],
@@ -62,6 +105,8 @@ You MUST output ONLY a valid JSON object with these keys:
 }}
 No markdown fences, no conversational prose, only pure JSON.
 """
+
+KARAKALPAK_SYSTEM_PROMPT = get_karakalpak_system_prompt()
 
 # Multi-tier Model Priority Cascade (Ranked from Best/Fastest to Most Reliable Backup)
 RANKED_MODEL_CASCADE = [
@@ -145,7 +190,7 @@ Return the result strictly as JSON:
                         model=target_model,
                         contents=user_prompt,
                         config=types.GenerateContentConfig(
-                            system_instruction=KARAKALPAK_SYSTEM_PROMPT,
+                            system_instruction=get_karakalpak_system_prompt(),
                             temperature=0.1,
                             response_mime_type="application/json",
                         ),
