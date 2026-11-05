@@ -43,6 +43,7 @@ class TranslationResponse(BaseModel):
     model_used: str = Field(..., description="AI Studio / Gemini model that performed translation")
     matched_terms_count: int = Field(..., description="Number of dictionary terms matched")
     matched_terms: List[DictionaryMatch] = Field(default_factory=list, description="Grounding dictionary matches")
+    used_vocabulary_note: Optional[str] = Field(None, description="Detailed list of dictionary vocabulary applied in translation")
 
 class BatchTranslationRequest(BaseModel):
     texts: List[str] = Field(
