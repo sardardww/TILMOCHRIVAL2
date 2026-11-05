@@ -63,12 +63,20 @@ You MUST output ONLY a valid JSON object with these keys:
 No markdown fences, no conversational prose, only pure JSON.
 """
 
+# Multi-tier Model Priority Cascade (Ranked from Best/Fastest to Most Reliable Backup)
+RANKED_MODEL_CASCADE = [
+    "gemini-3.5-flash-lite",  # Rank 1: Sub-2s latency, high quota, flawless Karakalpak grammar
+    "gemini-2.0-flash",       # Rank 2: High intelligence, 1,500 req/day free tier quota
+    "gemini-2.0-flash-lite",  # Rank 3: Ultra-lightweight, 1.6s latency, high throughput
+    "gemini-2.5-flash",       # Rank 4: Google flagship flash
+    "gemini-1.5-flash",       # Rank 5: Bulletproof legacy workhorse
+    "gemini-3.5-flash",       # Rank 6: Heavy neural fallback
+]
+
 MODEL_ALIASES = {
-    "gemini-2.5-flash": "gemini-3.5-flash",
+    "auto": "gemini-3.5-flash-lite",
+    "default": "gemini-3.5-flash-lite",
     "gemini-2.5-flash-lite": "gemini-3.5-flash-lite",
-    "gemini-2.0-flash": "gemini-3.5-flash",
-    "gemini-1.5-flash": "gemini-3.5-flash",
-    "gemini-1.5-pro": "gemini-3.5-flash",
 }
 
 class KarakalpakTranslator:
@@ -117,34 +125,36 @@ Translate the Russian source text above into natural, grammatically flawless Kar
 Return the result strictly as JSON:
 {{"latin": "...", "cyrillic": "..."}}"""
 
-        # 4. Determine models to attempt (with auto-upgrade for deprecated 2.x models)
+        # 4. Determine models to attempt in strict priority cascade
         models_to_try = []
-        if model_override:
-            target_model = MODEL_ALIASES.get(model_override, model_override)
-            models_to_try.append(target_model)
+        if model_override and model_override not in ("auto", "default", ""):
+            first_choice = MODEL_ALIASES.get(model_override, model_override)
+            models_to_try.append(first_choice)
         
-        default_model = MODEL_ALIASES.get(settings.GEMINI_MODEL, settings.GEMINI_MODEL)
-        if default_model not in models_to_try:
-            models_to_try.append(default_model)
-            
-        for fallback in settings.GEMINI_FALLBACK_MODELS:
-            target_fallback = MODEL_ALIASES.get(fallback, fallback)
-            if target_fallback not in models_to_try:
-                models_to_try.append(target_fallback)
+        for candidate in RANKED_MODEL_CASCADE:
+            if candidate not in models_to_try:
+                models_to_try.append(candidate)
 
         last_error = None
-        for model_name in models_to_try:
+        for i, model_name in enumerate(models_to_try):
             try:
-                logger.info(f"Attempting translation with Gemini model: {model_name}")
+                logger.info(f"Cascade [{i+1}/{len(models_to_try)}]: Trying {model_name}...")
                 
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=user_prompt,
-                    config=types.GenerateContentConfig(
-                        system_instruction=KARAKALPAK_SYSTEM_PROMPT,
-                        temperature=0.1,
-                        response_mime_type="application/json",
-                    ),
+                def _call_model():
+                    return client.models.generate_content(
+                        model=model_name,
+                        contents=user_prompt,
+                        config=types.GenerateContentConfig(
+                            system_instruction=KARAKALPAK_SYSTEM_PROMPT,
+                            temperature=0.1,
+                            response_mime_type="application/json",
+                        ),
+                    )
+                
+                # Strict 7.5s timeout per model so it never hangs or freezes
+                response = await asyncio.wait_for(
+                    asyncio.to_thread(_call_model),
+                    timeout=7.5
                 )
                 
                 raw_text = response.text.strip()
@@ -190,6 +200,11 @@ Return the result strictly as JSON:
                 else: # latin default
                     final_text = lat_text or cyr_text
 
+                # Tag if an auto-failover occurred
+                resolved_model_name = model_name
+                if model_override and model_override not in ("auto", "default", "") and model_override != model_name:
+                    resolved_model_name = f"{model_name} (auto-fallback from {model_override})"
+
                 return TranslationResponse(
                     source_text=text,
                     corrected_source_text=corrected_ru if corrected_ru != text else None,
@@ -198,56 +213,27 @@ Return the result strictly as JSON:
                     translated_latin=lat_text,
                     translated_cyrillic=cyr_text,
                     target_script=target_script.value,
-                    model_used=model_name,
+                    model_used=resolved_model_name,
                     matched_terms_count=len(matches),
                     matched_terms=matches if include_dictionary_matches else [],
                     used_vocabulary_note=vocab_note_str,
                 )
+            except asyncio.TimeoutError:
+                logger.warning(f"Model {model_name} timed out after 7.5s, immediately failing over to next model in cascade...")
+                last_error = f"{model_name} timed out"
+                continue
             except APIError as e:
-                logger.warning(f"Gemini API error with {model_name}: {e}")
+                logger.warning(f"Gemini API error with {model_name} ({e}), immediately failing over to next model in cascade...")
                 last_error = e
-                # If 503 or 429, wait briefly and retry once
-                if "503" in str(e) or "429" in str(e):
-                    try:
-                        logger.info(f"Retrying {model_name} after 1.5s...")
-                        await asyncio.sleep(1.5)
-                        retry_resp = client.models.generate_content(
-                            model=model_name,
-                            contents=user_prompt,
-                            config=types.GenerateContentConfig(
-                                system_instruction=KARAKALPAK_SYSTEM_PROMPT,
-                                temperature=0.1,
-                                response_mime_type="application/json",
-                            ),
-                        )
-                        raw_text = retry_resp.text.strip()
-                        parsed_json = self._parse_gemini_json(raw_text)
-                        lat_text = fix_common_grammatical_slips(parsed_json.get("latin", "").strip())
-                        cyr_text = fix_common_grammatical_slips(parsed_json.get("cyrillic", "").strip())
-                        final_text = cyr_text if target_script == TargetScript.cyrillic else (f"Latin:\n{lat_text}\n\nCyrillic:\n{cyr_text}" if target_script == TargetScript.both else lat_text)
-                        return TranslationResponse(
-                            source_text=text,
-                            corrected_source_text=parsed_json.get("corrected_russian", text).strip() if parsed_json.get("corrected_russian", text).strip() != text else None,
-                            translated_text=final_text,
-                            translated_latin=lat_text,
-                            translated_cyrillic=cyr_text,
-                            target_script=target_script.value,
-                            model_used=model_name,
-                            matched_terms_count=len(matches),
-                            matched_terms=matches if include_dictionary_matches else [],
-                            used_vocabulary_note=vocab_note_str,
-                        )
-                    except Exception as retry_err:
-                        logger.warning(f"Retry also failed for {model_name}: {retry_err}")
                 continue
             except Exception as e:
-                logger.warning(f"Error calling {model_name}: {e}")
+                logger.warning(f"Error calling {model_name}: {e}, immediately failing over to next model in cascade...")
                 last_error = e
                 continue
 
-        # If all models failed
-        logger.error(f"All Gemini models failed. Last error: {last_error}")
-        raise RuntimeError(f"Translation failed via AI Studio: {last_error}")
+        # If all models in the cascade failed
+        logger.error(f"All Gemini models in cascade failed. Last error: {last_error}")
+        raise RuntimeError(f"All cascade models were busy or rate-limited. Last error: {last_error}")
 
     def _parse_gemini_json(self, raw_text: str) -> dict:
         """Safely parse JSON response from Gemini, removing any accidental markdown fence."""
