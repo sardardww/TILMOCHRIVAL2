@@ -108,3 +108,60 @@ Attached to nouns, adjectives, and verbs acting as predicates:
   Adjectives preceding nouns DO NOT take plural or case endings:
   - `biyik tawlar` (CORRECT)
   - ~~`biyikler tawlar`~~ (INCORRECT)
+
+---
+
+## 8. Qaraqalpaq Leksikalıq hám Orfografiyalıq Qáwipleri (Anti-Uzbekism & Anti-Kazakhism)
+
+Awızeki tilde yamasa mashinalıq awdarmada qaraqalpaq tili kóbinese qońsılas ózbek hám qazaq tilleriniń tásirine ushıraydı. Tómendegi leksikalıq hám orfografiyalıq formalar qatań qadaǵalanadı:
+
+### A. Qazaq tilinen alınıp qatelesetuǵın sózler (Qazaqizmler):
+| Qáte (Qazaqsha forma) | Durıs (Qaraqalpaqsha ádebiy forma) | Mısal |
+|---|---|---|
+| *jasandı / jasandıq* | **jasama / jasamalıq** | jasama intellekt (NEVER jasandı) |
+| *ótkezdi / ótkezildi* | **ótkerdi / ótkerildi** | jarıs ótkerildi |
+| *erkinen ayırıw* | **azatlıǵınan ayırıw** | 3 jılǵa azatlıǵınan ayırıw jazası |
+| *túngish márte* | **dáslepki márte** | dáslepki márte shólkemlestirildi |
+| *orın aldı* | **júz berdi** | waqıya júz berdi |
+| *joba* | **joybar** | jańa joybar |
+| *baǵıt* | **baǵdar** | tiykarǵı baǵdarlar |
+| *múmkindik* | **múmkinshilik** | úlken múmkinshilikler |
+| *jıynalıs* | **májilis** | májilis ótkerildi |
+| *quwattı* | **quwatlı** | quwatlı kárxana |
+| *qáwipti* | **qáwipli** | qáwipli jaǵday |
+| *qarap* | **qaray** | hawa rayına qaray |
+
+### B. Ózbek tilinen kirip ketetuǵın sózler (Ózbekizmler):
+| Qáte (Ózbekshe forma) | Durıs (Qaraqalpaqsha ádebiy forma) |
+|---|---|
+| *tanaffus* | **tánepis** |
+| *saroy* | **saray** |
+| *bezorilik / bizarılıq* | **buzaqılıq** |
+| *kambag'al* | **kámbaǵal** |
+| *tezyurar* | **tez júrer** |
+| *jonivor / janıwar* | **janzat** |
+| *tunda / kunda* | **túnde / kúnde** |
+| *turar joy* | **turaq jay** |
+| *hakam / hakamlik* | **tóreshi / tóreshilik** |
+| *nazariy* | **teoriyalıq** |
+| *bajarmasa / bajarildi* | **orınlamasa / orınlandı** |
+| *do'kon* | **dúkan** |
+| *qoida* | **qaǵıyda** |
+| *favqulodda* | **ayrıqsha** |
+| *mutaxassis* | **qánige** |
+| *uchun* | **ushın** |
+| *chunki* | **sebebi / óytkeni** |
+| *bilan* | **menen** |
+| *tashkilot* | **shólkem** |
+| *korxona* | **kárxana** |
+| *ishlab chiqarish* | **islep shıǵarıw** |
+| *hamkorlik* | **birge islesiw** |
+
+### C. 2016-jılǵı Rásmiy Qaraqalpaq Latın Alfavitiniń Ózgeshelikleri:
+1. **Akutlı háripler**: `Á á`, `Ǵ ǵ`, `Ń ń`, `Ó ó`, `Ú ú`.
+2. **Nókatsız `ı`**: Juwan dawıslı (uzınlıq, shıǵıs, qız).
+3. **Nókatlı `i`**: Jińishke dawıslı (bir, tis, minnetleme). 'mínnetleme' jazıw qáte, 'minnetleme' jazılıwı shárt.
+4. **Toponimler hám atamalar**:
+   - `Uzgidromet` ➔ **`Ózgidromet`**
+   - `Savitskiy` ➔ **`Savickiy`**
+   - `Alat` ➔ **`Álot`**
