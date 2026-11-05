@@ -35,6 +35,11 @@ def load_academic_grammar_text() -> str:
 
 # Pre-compiled static rules for phonology, loanwords, and toponyms
 STATIC_SLIPS_PATTERNS: List[Tuple[str, str]] = [
+    # Core Kazakh/Uzbek false friends
+    (r"\bjasand([ıi])\b", "jasama"),
+    (r"\bjasandıq\b", "jasamalıq"),
+    (r"\bjasalma\b", "jasama"),
+    (r"\bжасанды\b", "жасама"),
     # Toponyms & proper names
     (r"\bUzgidromet\b", "Ózgidromet"),
     (r"\bSavitskiy\b", "Savickiy"),
