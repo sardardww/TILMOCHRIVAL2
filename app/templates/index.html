@@ -481,8 +481,25 @@
           throw new Error(data.detail || 'Translation request failed');
         }
 
-        // Display translation
-        let outputHtml = `<div style="font-size: 1.15rem; font-weight: 600; color: #f8fafc; margin-bottom: 0.75rem;">${escapeHtml(data.translated_text)}</div>`;
+        // Display Step 1 Russian Auto-Correction notice if typos were found
+        let outputHtml = '';
+        if (data.corrected_source_text && data.corrected_source_text !== data.source_text) {
+          let correctionsBadges = '';
+          if (data.corrections_made && data.corrections_made.length > 0) {
+            correctionsBadges = data.corrections_made.map(c => 
+              `<span style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-right: 0.4rem;"><s>${escapeHtml(c.original)}</s> ➔ <b style="color: #4ade80;">${escapeHtml(c.corrected)}</b></span>`
+            ).join('');
+          }
+          outputHtml += `
+            <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 0.65rem 0.85rem; margin-bottom: 0.85rem; font-size: 0.825rem;">
+              <div style="font-weight: 700; color: #38bdf8; margin-bottom: 0.35rem;">✍️ 1-bosqich: Ruscha imlo toʻgʻrilandi (Auto-Corrected):</div>
+              <div style="color: #e2e8f0; font-style: italic; margin-bottom: 0.35rem;">"${escapeHtml(data.corrected_source_text)}"</div>
+              <div>${correctionsBadges}</div>
+            </div>
+          `;
+        }
+
+        outputHtml += `<div style="font-size: 1.15rem; font-weight: 600; color: #f8fafc; margin-bottom: 0.75rem;">${escapeHtml(data.translated_text)}</div>`;
         
         // State used vocabulary at the end
         if (data.matched_terms && data.matched_terms.length > 0) {

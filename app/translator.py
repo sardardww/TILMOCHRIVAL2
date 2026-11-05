@@ -9,34 +9,57 @@ from google.genai.errors import APIError
 from app.config import settings
 from app.dictionary_service import dictionary_service
 from app.grammar_service import KARAKALPAK_ACADEMIC_GRAMMAR_PROMPT, fix_common_grammatical_slips
-from app.schemas import TargetScript, TranslationResponse, DictionaryMatch
+from app.schemas import TargetScript, TranslationResponse, DictionaryMatch, TextCorrection
 
 logger = logging.getLogger(__name__)
 
-KARAKALPAK_SYSTEM_PROMPT = f"""You are a master linguist and native professional translator specializing in the Karakalpak language (Qaraqalpaq tili / Қарақалпақ тили).
-Your mission is to translate Russian text into natural, grammatically flawless Karakalpak based on official academic norms.
+KARAKALPAK_SYSTEM_PROMPT = f"""You are a master linguist, expert Russian proofreader, and native professional translator specializing in the Karakalpak language (Qaraqalpaq tili / Қарақалпақ тили).
+Your mission is to perform a mandatory 3-step translation pipeline from Russian into natural, grammatically flawless Karakalpak.
+
+==================================================
+MANDATORY 3-STEP TRANSLATION PIPELINE
+==================================================
+
+--- STEP 1: RUSSIAN SPELL-CHECK & GRAMMAR EDIT ---
+- First, thoroughly inspect the Russian input text for any spelling errors, typos, missing/extra letters, or colloquial slips.
+  Examples:
+  * "исскуственный" -> "искусственный"
+  * "здраствуйте" -> "здравствуйте"
+  * "уневерситет" -> "университет"
+  * "програмирование" -> "программирование"
+  * "превейд" -> "привет"
+- Edit and normalize the text into 100% correct literary Russian before proceeding to translation.
+- Store the corrected Russian sentence in "corrected_russian".
+- List each corrected word pair in "corrections": [{{"original": "...", "corrected": "..."}}]. If no errors were found, provide an empty list [].
+
+--- STEP 2: VOCABULARY GROUNDING ---
+- Check the MANDATORY GROUNDING VOCABULARY provided in the prompt.
+- For all concepts in the corrected Russian sentence, strictly adhere to the Karakalpak terms provided.
+- ZERO TOLERANCE FOR KAZAKH / UZBEK BORROWINGS:
+  * Russian "искусственный" = Karakalpak "jasama" (NEVER Kazakh "jasandı"!).
+  * Russian "естественный" = Karakalpak "tábiyiy".
+  * Russian "образование" = Karakalpak "bilimlendiriw" or "tálim".
+
+--- STEP 3: ACADEMIC KARAKALPAK TRANSLATION ---
+Translate the corrected Russian text into Karakalpak adhering to:
+1. Turkic SOV syntax (Subject -> Objects/Adverbs -> Verb at the end).
+2. Singarmonizm / Vowel Harmony:
+   - Front vowel words (containing e, i, ó, ú, á) take front suffixes (-pen, -men, -ge, -de, -ler). E.g. "intellektpen" (NEVER "intellektpin").
+   - Back vowel words (containing a, ı, o, u) take back suffixes (-pan, -man, -ǵa, -da, -lar).
 
 {KARAKALPAK_ACADEMIC_GRAMMAR_PROMPT}
 
-CRITICAL VOCABULARY RULES (NO KAZAKH / UZBEK BORROWINGS):
-1. MANDATORY DICTIONARY GROUNDING:
-   - When a word is in the MANDATORY GROUNDING VOCABULARY, you MUST use the exact Karakalpak translation provided.
-   - DO NOT USE KAZAKH COGNATES!
-     * Russian "искусственный" = Karakalpak "jasama" (NEVER "jasandı"!).
-     * Russian "естественный" = Karakalpak "tábiyiy".
-     * Russian "образование" = Karakalpak "bilimlendiriw" or "tálim".
-2. Vowel Harmony & Suffix Agreement:
-   - Front vowel words (containing e, i, ó, ú, á) take -pen/-men/-de/-den/-ge/-ler (e.g. "intellektpen", NOT "intellektpin").
-   - Back vowel words (containing a, ı, o, u) take -pan/-man/-da/-dan/-ǵa/-lar.
-3. Word Order:
-   - Strict Turkic SOV order: Subject first, adverbials/objects in the middle, predicate verb at the end.
-4. Output Format:
-   - You MUST output ONLY a valid JSON object with exactly two keys:
-     {{
-       "latin": "Karakalpak translation in official Latin script",
-       "cyrillic": "Karakalpak translation in Cyrillic script"
-     }}
-   - No explanations, no markdown comments, pure JSON only.
+OUTPUT FORMAT:
+You MUST output ONLY a valid JSON object with these keys:
+{{
+  "corrected_russian": "Corrected Russian sentence",
+  "corrections": [
+    {{"original": "misspelled_word", "corrected": "correct_word"}}
+  ],
+  "latin": "Karakalpak translation in official 34-letter Latin script",
+  "cyrillic": "Karakalpak translation in Cyrillic script"
+}}
+No markdown fences, no conversational prose, only pure JSON.
 """
 
 MODEL_ALIASES = {
@@ -128,6 +151,24 @@ Return the result strictly as JSON:
                 
                 lat_text = parsed_json.get("latin", "").strip()
                 cyr_text = parsed_json.get("cyrillic", "").strip()
+                corrected_ru = parsed_json.get("corrected_russian", text).strip()
+                
+                # Parse list of corrections
+                raw_corrections = parsed_json.get("corrections", [])
+                corrections_list = []
+                if isinstance(raw_corrections, list):
+                    for c in raw_corrections:
+                        if isinstance(c, dict) and "original" in c and "corrected" in c:
+                            corrections_list.append(TextCorrection(original=str(c["original"]), corrected=str(c["corrected"])))
+
+                # If Russian typos were corrected, check if more dictionary matches can be discovered
+                if corrected_ru and corrected_ru.lower() != text.lower():
+                    extra_matches = dictionary_service.extract_matches_for_text(corrected_ru)
+                    existing_lemmas = {m.dictionary_lemma for m in matches}
+                    for em in extra_matches:
+                        if em.dictionary_lemma not in existing_lemmas:
+                            matches.append(em)
+                            existing_lemmas.add(em.dictionary_lemma)
 
                 # Apply academic grammar post-processing for known morphophonemic slips
                 lat_text = fix_common_grammatical_slips(lat_text)
@@ -150,6 +191,8 @@ Return the result strictly as JSON:
 
                 return TranslationResponse(
                     source_text=text,
+                    corrected_source_text=corrected_ru if corrected_ru != text else None,
+                    corrections_made=corrections_list,
                     translated_text=final_text,
                     translated_latin=lat_text,
                     translated_cyrillic=cyr_text,

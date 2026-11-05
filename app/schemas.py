@@ -34,8 +34,14 @@ class TranslationRequest(BaseModel):
         description="Whether to include dictionary lookup details in response"
     )
 
+class TextCorrection(BaseModel):
+    original: str = Field(..., description="Original misspelled Russian word")
+    corrected: str = Field(..., description="Corrected Russian word")
+
 class TranslationResponse(BaseModel):
-    source_text: str = Field(..., description="Original Russian text")
+    source_text: str = Field(..., description="Original Russian text entered by user")
+    corrected_source_text: Optional[str] = Field(None, description="Step 1: Auto-corrected, normalized Russian text")
+    corrections_made: List[TextCorrection] = Field(default_factory=list, description="List of spelling/grammar corrections made in Russian")
     translated_text: str = Field(..., description="Karakalpak translation in requested script")
     translated_latin: Optional[str] = Field(None, description="Karakalpak translation in official Latin script")
     translated_cyrillic: Optional[str] = Field(None, description="Karakalpak translation in Cyrillic script")

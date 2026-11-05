@@ -1,3 +1,4 @@
+import difflib
 import json
 import logging
 import re
@@ -146,6 +147,12 @@ class KarakalpakDictionaryService:
                     if stem in self.stem_index and self.stem_index[stem]:
                         matched_key = self.stem_index[stem][0]
                         break
+
+            # If still not matched and word has typos, try fuzzy matching against dictionary
+            if not matched_key and len(w_norm) >= 5:
+                close = difflib.get_close_matches(w_norm, self.dictionary.keys(), n=1, cutoff=0.80)
+                if close:
+                    matched_key = close[0]
 
             if matched_key and matched_key not in seen_keys:
                 seen_keys.add(matched_key)
