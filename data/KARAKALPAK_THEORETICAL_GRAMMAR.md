@@ -165,3 +165,13 @@ Awızeki tilde yamasa mashinalıq awdarmada qaraqalpaq tili kóbinese qońsılas
    - `Uzgidromet` ➔ **`Ózgidromet`**
    - `Savitskiy` ➔ **`Savickiy`**
    - `Alat` ➔ **`Álot`**
+
+### D. Tabıs Sepligi Assimilyaciyası (Accusative Case Assimilation):
+Únli dawıssızlar (m, n, ń, l, r, w, y) dan keyin qatań '-tı / -ti' jalǵawı EMES, uyań '-dı / -di' jalǵawı qosılıwı shárt:
+| Qáte (Qatań forma) | Durıs (Uyań forma) | Dálil |
+|---|---|---|
+| *ilimti* | **ilimdi** | Únli 'm' dawıssızınan keyin '-di' qosıladı |
+| *adamtı* | **adamdı** | Únli 'm' dawıssızınan keyin '-dı' qosıladı |
+| *qálemti* | **qálemdi** | Únli 'm' dawıssızınan keyin '-di' qosıladı |
+| *muǵallimti* | **muǵallimdi** | Únli 'm' dawıssızınan keyin '-di' qosıladı |
+| *filimti / filmti* | **filmdi** | Únli 'm' dawıssızınan keyin '-di' qosıladı |

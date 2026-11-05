@@ -56,7 +56,11 @@ STATIC_SLIPS_PATTERNS: List[Tuple[str, str]] = [
     (r"\bpútinley\b", "bútinley"),
     (r"\btásirsheń\b", "tásirsheń"),
 
-    # Suffixes & Predicatives (Singarmonizm for loanwords)
+    # Suffixes & Predicatives (Singarmonizm and Case Assimilation)
+    (r"\bilimti\b", "ilimdi"),
+    (r"\bилимти\b", "илимди"),
+    (r"\b([A-Za-zÁáÓóÚúǴǵŃńıI]{2,}[mnńlrwy])ti\b", r"\1di"),
+    (r"\b([A-Za-zÁáÓóÚúǴǵŃńıI]{2,}[mnńlrwy])tı\b", r"\1dı"),
     (r"\b([A-Za-zÁáÓóÚúǴǵŃńıI]*[eióúá][ptkqsxf])pin\b", r"\1pen"),
     (r"\b([A-Za-zÁáÓóÚúǴǵŃńıI]*[aıou][ptkqsxf])pin\b", r"\1pan"),
     (r"\b([A-Za-zÁáÓóÚúǴǵŃńıI]*[eióúá])mın\b", r"\1men"),
