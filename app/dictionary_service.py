@@ -56,8 +56,16 @@ class KarakalpakDictionaryService:
             # Pre-index for rapid stem-based lookup and multi-word phrase matching
             self.stem_index = {}
             self.phrase_keys = []
+            self.first_char_index = {}
             
             for key in self.dictionary.keys():
+                if not key:
+                    continue
+                fc = key[0].lower().replace('ё', 'е')
+                if fc not in self.first_char_index:
+                    self.first_char_index[fc] = []
+                self.first_char_index[fc].append(key)
+
                 clean_key = re.sub(r'\(.*?\)', '', key).strip().lower().replace('ё', 'е')
                 if not clean_key:
                     continue
@@ -148,11 +156,13 @@ class KarakalpakDictionaryService:
                         matched_key = self.stem_index[stem][0]
                         break
 
-            # If still not matched and word has typos, try fuzzy matching against dictionary
-            if not matched_key and len(w_norm) >= 5:
-                close = difflib.get_close_matches(w_norm, self.dictionary.keys(), n=1, cutoff=0.80)
-                if close:
-                    matched_key = close[0]
+            # If still not matched and word has typos, try ultra-fast bucketed fuzzy matching
+            if not matched_key and len(w_norm) >= 4:
+                candidates = self.first_char_index.get(w_norm[0], [])
+                if candidates:
+                    close = difflib.get_close_matches(w_norm, candidates, n=1, cutoff=0.78)
+                    if close:
+                        matched_key = close[0]
 
             if matched_key and matched_key not in seen_keys:
                 seen_keys.add(matched_key)

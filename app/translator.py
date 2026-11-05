@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import re
@@ -205,6 +206,39 @@ Return the result strictly as JSON:
             except APIError as e:
                 logger.warning(f"Gemini API error with {model_name}: {e}")
                 last_error = e
+                # If 503 or 429, wait briefly and retry once
+                if "503" in str(e) or "429" in str(e):
+                    try:
+                        logger.info(f"Retrying {model_name} after 1.5s...")
+                        await asyncio.sleep(1.5)
+                        retry_resp = client.models.generate_content(
+                            model=model_name,
+                            contents=user_prompt,
+                            config=types.GenerateContentConfig(
+                                system_instruction=KARAKALPAK_SYSTEM_PROMPT,
+                                temperature=0.1,
+                                response_mime_type="application/json",
+                            ),
+                        )
+                        raw_text = retry_resp.text.strip()
+                        parsed_json = self._parse_gemini_json(raw_text)
+                        lat_text = fix_common_grammatical_slips(parsed_json.get("latin", "").strip())
+                        cyr_text = fix_common_grammatical_slips(parsed_json.get("cyrillic", "").strip())
+                        final_text = cyr_text if target_script == TargetScript.cyrillic else (f"Latin:\n{lat_text}\n\nCyrillic:\n{cyr_text}" if target_script == TargetScript.both else lat_text)
+                        return TranslationResponse(
+                            source_text=text,
+                            corrected_source_text=parsed_json.get("corrected_russian", text).strip() if parsed_json.get("corrected_russian", text).strip() != text else None,
+                            translated_text=final_text,
+                            translated_latin=lat_text,
+                            translated_cyrillic=cyr_text,
+                            target_script=target_script.value,
+                            model_used=model_name,
+                            matched_terms_count=len(matches),
+                            matched_terms=matches if include_dictionary_matches else [],
+                            used_vocabulary_note=vocab_note_str,
+                        )
+                    except Exception as retry_err:
+                        logger.warning(f"Retry also failed for {model_name}: {retry_err}")
                 continue
             except Exception as e:
                 logger.warning(f"Error calling {model_name}: {e}")
