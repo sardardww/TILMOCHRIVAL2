@@ -14,83 +14,46 @@ from app.schemas import TargetScript, TranslationResponse, DictionaryMatch, Text
 
 logger = logging.getLogger(__name__)
 
-KARAKALPAK_SYSTEM_PROMPT = f"""You are a master linguist, expert multilingual proofreader, and native professional translator specializing in the Karakalpak language (Qaraqalpaq tili / Қарақалпақ тили).
-Your mission is to perform a mandatory 3-step translation pipeline from source text (Russian, Uzbek, or mixed) into natural, grammatically flawless, literary Karakalpak.
+KARAKALPAK_SYSTEM_PROMPT = f"""You are a master linguist, expert Russian proofreader, and native professional translator specializing in the Karakalpak language (Qaraqalpaq tili / Қарақалпақ тили).
+Your mission is to perform a mandatory 3-step translation pipeline from Russian into natural, grammatically flawless Karakalpak.
 
 ==================================================
 MANDATORY 3-STEP TRANSLATION PIPELINE
 ==================================================
 
---- STEP 1: SOURCE SPELL-CHECK & NORMALIZATION ---
-- First, thoroughly inspect the source input text (Russian or Uzbek) for any spelling errors, typos, missing/extra letters, or colloquial slips.
+--- STEP 1: RUSSIAN SPELL-CHECK & GRAMMAR EDIT ---
+- First, thoroughly inspect the Russian input text for any spelling errors, typos, missing/extra letters, or colloquial slips.
   Examples:
   * "исскуственный" -> "искусственный"
   * "здраствуйте" -> "здравствуйте"
   * "уневерситет" -> "университет"
   * "програмирование" -> "программирование"
   * "превейд" -> "привет"
-- Normalize the text into 100% correct literary source text before proceeding to translation.
-- Store the corrected source sentence in "corrected_russian".
+- Edit and normalize the text into 100% correct literary Russian before proceeding to translation.
+- Store the corrected Russian sentence in "corrected_russian".
 - List each corrected word pair in "corrections": [{{"original": "...", "corrected": "..."}}]. If no errors were found, provide an empty list [].
 
---- STEP 2: VOCABULARY GROUNDING & PURITY ---
+--- STEP 2: VOCABULARY GROUNDING ---
 - Check the MANDATORY GROUNDING VOCABULARY provided in the prompt.
-- For all concepts in the corrected source sentence, strictly adhere to the Karakalpak terms provided.
-- ZERO TOLERANCE FOR KAZAKH / UZBEK FALSE FRIENDS & BORROWINGS:
-  Strictly apply the following Karakalpak lexical standards:
-  * "искусственный" / "sun'iy" = Karakalpak "jasama" (NEVER Kazakh "jasandı"!).
-  * "естественный" / "tabiiy" = Karakalpak "tábiyiy".
-  * "образование" / "ta'lim" = Karakalpak "bilimlendiriw" or "tálim".
-  * Russian "проект" / Uzbek "loyiha" / Kazakh "joba" = Karakalpak "joybar".
-  * Russian "направление" / Uzbek "yo'nalish" / Kazakh "baǵıt" = Karakalpak "baǵdar".
-  * Russian "возможность" / Uzbek "imkoniyat" / Kazakh "múmkindik" = Karakalpak "múmkinshilik".
-  * Russian "собрание" / Uzbek "yig'ilish" / Kazakh "jıynalıs" = Karakalpak "májilis".
-  * Russian "провел/провела" / Kazakh "ótkezdi" = Karakalpak "ótkerdi".
-  * Russian "лишение свободы" / Kazakh "erkinen ayırıw" = Karakalpak "azatlıǵınan ayırıw".
-  * Russian "впервые" / Kazakh "túngish márte" = Karakalpak "dáslepki márte".
-  * Russian "имело место / произошло" / Kazakh "orın aldı" = Karakalpak "júz berdi".
-  * Russian "перерыв" / Uzbek "tanaffus" = Karakalpak "tánepis".
-  * Russian "дворец" / Uzbek "saroy" = Karakalpak "saray".
-  * Russian "хулиганство" / Uzbek "bezorilik" = Karakalpak "buzaqılıq".
-  * Russian "малообеспеченный / бедный" / Uzbek "kambag'al" = Karakalpak "kámbaǵal".
-  * Russian "скоростной" / Uzbek "tezyurar" = Karakalpak "tez júrer".
-  * Russian "животное" / Uzbek "jonivor" = Karakalpak "janzat".
-  * Russian "ночью" / Uzbek "tunda" = Karakalpak "túnde".
-  * Russian "днем" / Uzbek "kunda" = Karakalpak "kúnde".
-  * Russian "жилье" / Uzbek "turar joy" = Karakalpak "turaq jay".
-  * Russian "судейство" / Uzbek "hakamlik" = Karakalpak "tóreshilik".
-  * Russian "судья" / Uzbek "hakam" = Karakalpak "tóreshi".
-  * Russian "теоретический" / Uzbek "nazariy" = Karakalpak "teoriyalıq".
-  * Russian "магазин" / Uzbek "do'kon" = Karakalpak "dúkan".
-  * Russian "правило" / Uzbek "qoida" = Karakalpak "qaǵıyda".
-  * Russian "чрезвычайный" / Uzbek "favqulodda" = Karakalpak "ayrıqsha".
-  * Russian "специалист" / Uzbek "mutaxassis" = Karakalpak "qánige".
-  * Russian "для" / Uzbek "uchun" = Karakalpak "ushın".
-  * Russian "потому что" / Uzbek "chunki" = Karakalpak "sebebi" / "óytkeni".
-  * Russian "с / вместе с" / Uzbek "bilan" = Karakalpak "menen".
-  * Russian "организация" / Uzbek "tashkilot" = Karakalpak "shólkem".
-  * Russian "предприятие" / Uzbek "korxona" = Karakalpak "kárxana".
-  * Russian "производство" / Uzbek "ishlab chiqarish" = Karakalpak "islep shıǵarıw".
-  * Russian "сотрудничество" / Uzbek "hamkorlik" = Karakalpak "birge islesiw".
-  * Toponyms / Proper names: "Узгидромет" / "Uzgidromet" -> "Ózgidromet", "Савицкий" -> "Savickiy", "Алатский район" -> "Álot rayonı".
+- For all concepts in the corrected Russian sentence, strictly adhere to the Karakalpak terms provided.
+- ZERO TOLERANCE FOR KAZAKH / UZBEK BORROWINGS:
+  * Russian "искусственный" = Karakalpak "jasama" (NEVER Kazakh "jasandı"!).
+  * Russian "естественный" = Karakalpak "tábiyiy".
+  * Russian "образование" = Karakalpak "bilimlendiriw" or "tálim".
 
 --- STEP 3: ACADEMIC KARAKALPAK TRANSLATION ---
-Translate into Karakalpak adhering to:
+Translate the corrected Russian text into Karakalpak adhering to:
 1. Turkic SOV syntax (Subject -> Objects/Adverbs -> Verb at the end).
 2. Singarmonizm / Vowel Harmony:
    - Front vowel words (containing e, i, ó, ú, á) take front suffixes (-pen, -men, -ge, -de, -ler). E.g. "intellektpen" (NEVER "intellektpin").
    - Back vowel words (containing a, ı, o, u) take back suffixes (-pan, -man, -ǵa, -da, -lar).
-3. 2016 Karakalpak Latin Orthography:
-   - Use official acute letters: Á á, Ǵ ǵ, Ń ń, Ó ó, Ú ú.
-   - Use dotless 'ı' for back-vowel / juwan (uzınlıq, shıǵıs).
-   - Use dotted 'i' for front-vowel / jińishke (tis, minnetleme). NEVER write 'mínnetleme'.
 
 {KARAKALPAK_ACADEMIC_GRAMMAR_PROMPT}
 
 OUTPUT FORMAT:
 You MUST output ONLY a valid JSON object with these keys:
 {{
-  "corrected_russian": "Corrected source sentence",
+  "corrected_russian": "Corrected Russian sentence",
   "corrections": [
     {{"original": "misspelled_word", "corrected": "correct_word"}}
   ],
@@ -177,9 +140,9 @@ Return the result strictly as JSON:
             try:
                 logger.info(f"Cascade [{i+1}/{len(models_to_try)}]: Trying {model_name}...")
                 
-                def _call_model():
+                def _call_model(target_model=model_name):
                     return client.models.generate_content(
-                        model=model_name,
+                        model=target_model,
                         contents=user_prompt,
                         config=types.GenerateContentConfig(
                             system_instruction=KARAKALPAK_SYSTEM_PROMPT,
@@ -188,10 +151,10 @@ Return the result strictly as JSON:
                         ),
                     )
                 
-                # Strict 7.5s timeout per model so it never hangs or freezes
+                # Generous 14.0s timeout per model so complex long paragraphs complete successfully
                 response = await asyncio.wait_for(
                     asyncio.to_thread(_call_model),
-                    timeout=7.5
+                    timeout=14.0
                 )
                 
                 raw_text = response.text.strip()
@@ -256,21 +219,26 @@ Return the result strictly as JSON:
                     used_vocabulary_note=vocab_note_str,
                 )
             except asyncio.TimeoutError:
-                logger.warning(f"Model {model_name} timed out after 7.5s, immediately failing over to next model in cascade...")
+                logger.warning(f"Model {model_name} timed out after 14s, failing over to next model...")
                 last_error = f"{model_name} timed out"
                 continue
             except APIError as e:
-                logger.warning(f"Gemini API error with {model_name} ({e}), immediately failing over to next model in cascade...")
+                logger.warning(f"Gemini API error with {model_name} ({e}), failing over to next model...")
                 last_error = e
                 continue
             except Exception as e:
-                logger.warning(f"Error calling {model_name}: {e}, immediately failing over to next model in cascade...")
+                logger.warning(f"Error calling {model_name}: {e}, failing over to next model...")
                 last_error = e
                 continue
 
-        # If all models in the cascade failed
-        logger.error(f"All Gemini models in cascade failed. Last error: {last_error}")
-        raise RuntimeError(f"All cascade models were busy or rate-limited. Last error: {last_error}")
+        # If all models in the cascade were rate-limited or busy, gracefully fallback to dictionary translation
+        logger.warning(f"All cascade models were busy or rate-limited ({last_error}). Providing graceful dictionary fallback.")
+        return self._build_quota_fallback_response(
+            text=text,
+            target_script=target_script,
+            matches=matches,
+            last_error=str(last_error)
+        )
 
     def _parse_gemini_json(self, raw_text: str) -> dict:
         """Safely parse JSON response from Gemini, removing any accidental markdown fence."""
@@ -289,6 +257,60 @@ Return the result strictly as JSON:
                 "latin": lat_match.group(1) if lat_match else cleaned,
                 "cyrillic": cyr_match.group(1) if cyr_match else "",
             }
+
+    def _build_quota_fallback_response(
+        self,
+        text: str,
+        target_script: TargetScript,
+        matches: list[DictionaryMatch],
+        last_error: str
+    ) -> TranslationResponse:
+        """
+        Graceful dictionary-grounded fallback when Google AI Studio free tier quotas are temporarily exceeded.
+        Ensures the API never returns an unhandled 500 error screen.
+        """
+        # Build dictionary-assisted translation
+        terms_map = {}
+        vocab_notes = []
+        for m in matches:
+            lat_term = (m.qq_lat or "").split(";")[0].split("(")[0].strip()
+            cyr_term = (m.qq_cyr or "").split(";")[0].split("(")[0].strip()
+            terms_map[m.source_word.lower()] = (lat_term, cyr_term)
+            vocab_notes.append(f"• {m.dictionary_lemma} ➔ {lat_term}")
+
+        words = text.split()
+        lat_words = []
+        cyr_words = []
+        for w in words:
+            clean = re.sub(r"[^\w\s-]", "", w).lower()
+            if clean in terms_map:
+                lat_words.append(terms_map[clean][0] or w)
+                cyr_words.append(terms_map[clean][1] or w)
+            else:
+                lat_words.append(w)
+                cyr_words.append(w)
+
+        lat_translated = " ".join(lat_words)
+        cyr_translated = " ".join(cyr_words)
+        vocab_note_str = "\n".join(vocab_notes) if vocab_notes else None
+
+        final_text = cyr_translated if target_script == TargetScript.cyrillic else (
+            f"Latin:\n{lat_translated}\n\nCyrillic:\n{cyr_translated}" if target_script == TargetScript.both else lat_translated
+        )
+
+        return TranslationResponse(
+            source_text=text,
+            corrected_source_text=None,
+            corrections_made=[],
+            translated_text=final_text,
+            translated_latin=lat_translated,
+            translated_cyrillic=cyr_translated,
+            target_script=target_script.value,
+            model_used="⚡ Dictionary Standby Mode (Google AI Studio kvotasi yangilanmoqda)",
+            matched_terms_count=len(matches),
+            matched_terms=matches,
+            used_vocabulary_note=vocab_note_str,
+        )
 
     def _build_unconfigured_response(
         self,
