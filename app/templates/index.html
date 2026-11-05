@@ -481,7 +481,26 @@
           throw new Error(data.detail || 'Translation request failed');
         }
 
-        outputText.textContent = data.translated_text;
+        // Display translation
+        let outputHtml = `<div style="font-size: 1.15rem; font-weight: 600; color: #f8fafc; margin-bottom: 0.75rem;">${escapeHtml(data.translated_text)}</div>`;
+        
+        // State used vocabulary at the end
+        if (data.matched_terms && data.matched_terms.length > 0) {
+          const vocabItems = data.matched_terms.map(m => {
+            const target = script === 'cyrillic' ? (m.qq_cyr || m.qq_lat) : (m.qq_lat || m.qq_cyr);
+            const cleanTarget = target.split(';')[0].split('(')[0].trim();
+            return `<li style="margin-left: 1.25rem;"><b>${escapeHtml(m.dictionary_lemma)}</b> ➔ <span style="color: #38bdf8; font-weight: 600;">${escapeHtml(cleanTarget)}</span></li>`;
+          }).join('');
+
+          outputHtml += `
+            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed rgba(255,255,255,0.15); font-size: 0.85rem; color: #94a3b8;">
+              <div style="font-weight: 700; color: #a855f7; margin-bottom: 0.35rem;">📖 Qollanılǵan sózlik (Vocabulary used from dictionary):</div>
+              <ul style="list-style-type: square; line-height: 1.5;">${vocabItems}</ul>
+            </div>
+          `;
+        }
+
+        outputText.innerHTML = outputHtml;
 
         // Render dictionary grounding chips
         if (data.matched_terms && data.matched_terms.length > 0) {
@@ -500,6 +519,11 @@
         btn.disabled = false;
         btnText.textContent = 'Translate Now ➔';
       }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
   </script>
 </body>
