@@ -118,6 +118,7 @@ Awızeki tilde yamasa mashinalıq awdarmada qaraqalpaq tili kóbinese qońsılas
 ### A. Qazaq tilinen alınıp qatelesetuǵın sózler (Qazaqizmler):
 | Qáte (Qazaqsha forma) | Durıs (Qaraqalpaqsha ádebiy forma) | Mısal |
 |---|---|---|
+| *jastar / jastarı* | **jaslar / jasları** |
 | *jasandı / jasandıq* | **jasama / jasamalıq** | jasama intellekt (NEVER jasandı) |
 | *ótkezdi / ótkezildi* | **ótkerdi / ótkerildi** | jarıs ótkerildi |
 | *erkinen ayırıw* | **azatlıǵınan ayırıw** | 3 jılǵa azatlıǵınan ayırıw jazası |
