@@ -219,3 +219,41 @@ Awızeki tilde yamasa mashinalıq awdarmada qaraqalpaq tili kóbinese qońsılas
 | *qálemti* | **qálemdi** | Únli 'm' dawıssızınan keyin '-di' qosıladı |
 | *muǵallimti* | **muǵallimdi** | Únli 'm' dawıssızınan keyin '-di' qosıladı |
 | *filimti / filmti* | **filmdi** | Únli 'm' dawıssızınan keyin '-di' qosıladı |
+
+---
+
+### E. Leksikalıq hám Semantikalıq Qáteliklerdiń Kelip Shıǵıw Sebepleri (Linguistic Root-Cause Analysis)
+
+Mashinalıq awdarma hám neyrotarqaǵıshlar (LLM) qaraqalpaq tiline awdarma jasaǵanda eń kóp jol qoyatuǵın sistemalı qáteliklerdiń lingvistikalıq sebepleri hám dálilleri:
+
+1. **2016-jılǵı Latın Orfografiyasınıń 'c' háribi (Xalıqaralıq sózler)**:
+   - **Qátelik**: *aksiyalar, aksiyalardıń, konstitutsiya, politsiya*
+   - **Durıs**: **`akciyalar`**, **`akciyalardıń`**, **`konstituciya`**, **`policiya`**
+   - **Kelip shıǵıw sebebi**: Ózbek latın imlosında `s` yamasa `ts` qollanıladı (*aksiya, konstitutsiya*). Qaraqalpaq tiliniń 2016-jılǵı rásmiy latın alfavitinde bolsa rus tilindegi «ц» háribi xalıqaralıq sózlerde qatań túrde **`c`** háribi arqalı tańbalanadı. Neyrotarmoqlar ózbek tili korpusınıń tásirinde `ks` dep jazıp qoyadı.
+
+2. **Semantikalıq Psevdo-Kalka (Data Center ➔ Derek-orayı qáteligi)**:
+   - **Qátelik**: *derek-orayları, derek-oraylarında*
+   - **Durıs**: **`maǵlıwmatlar orayı`** (yamasa *data-centrler*)
+   - **Kelip shıǵıw sebebi**: Qaraqalpaq tilinde *derek* sózi «bulaq, dáwir kózawayı, derek» (источник) mánisin ańlatadı. Russha «дата-центр» (data) sózin model maǵlıwmat penen emes, jasalma túrde *derek* penen almastırıp, «bulaq orayı» degen maǵanasız sóz payda etken. Informaciya hám maǵlıwmat saqlaw ornı qaraqalpaqsha **`maǵlıwmatlar orayı`** boladı.
+
+3. **Dawıssızlar Assimilyaciyası hám Orfografiyalıq Qısqarıwlar**:
+   - **Qátelik**: *ádeyir*
+   - **Durıs**: **`ádeywir`** (sezilerli dárejede)
+   - **Kelip shıǵıw sebebi**: Awızeki tilde `w` háribi jutılıp ketiwi múmkin, biraq ádebiy jazba tilde vokal-labial `w` háribi qatań saqlanıwı shárt.
+
+4. **Analitikalıq Sóz Birikpeleri (Shama menen)**:
+   - **Qátelik**: *shamamen*
+   - **Durıs**: **`shama menen`**
+   - **Kelip shıǵıw sebebi**: Qaraqalpaq tilinde shamalaw mánisi kómekshi sóz arqalı analitikalıq jol menen bildiriledi: sózlik quramında `shama` hám `menen` sózleri bólek jazıladı.
+
+5. **Qazaqsha Sózlerdiń Qaraqalpaq Tekstine Kirip Ketiwi (Qazaqizmler)**:
+   - **Qátelik**: *shıntlap* ➔ **`shın mánisinde / shınında da`** (qazaqsha: *шындап*)
+   - **Qátelik**: *topılıs* ➔ **`qurallı hújim`** (qazaqsha: *топылыс*)
+   - **Qátelik**: *jasawshı / jasawshıları* ➔ **`turǵın / turǵınları`** (qazaqsha: *тұрғындар*, *жасаушылар*)
+   - **Qátelik**: *alımlar* ➔ **`ilimpazlar`** (qazaqsha: *ғалымдар*)
+   - **Kelip shıǵıw sebebi**: Qaraqalpaq hám qazaq tilleri qıpshaq toparına kirgenligi sebepli, internet korpusında qazaq tilindegi adabiy emes dialektal formalar qaraqalpaqsha dep qabıl etiledi. Biraq qaraqalpaq ádebiy tilinde olardıń óz qat'iy normativ ekvivalentleri bar.
+
+6. **So'zme-so'z Awırmalıq Kalkalar (Idiyomatik buzulıwlar)**:
+   - **Qátelik**: *jas basqan adamlar* ➔ **`kekseler / jas úlkenler`** (russha «пожилые люди» sóziniń sózbe-sóz qátelik kalkası).
+   - **Qátelik**: *shıń saatları* ➔ **`eń tıǵız saatlar`** (inglizshe «rush hour» / russha «часы пик» sózindegi «пик»ti tawdıń shıńı dep qáte kalkalaw).
+   - **Qátelik**: *biytarap ońay emes arada* ➔ **`sońǵı waqıtlarda`** (quramalı kontekstti orınsız awdarıw).
