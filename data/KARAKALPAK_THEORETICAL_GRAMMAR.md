@@ -342,3 +342,40 @@ Mashinalıq awdarma hám neyrotarqaǵıshlar (LLM) qaraqalpaq tiline awdarma jas
      * **Qátelik**: *politsiyası*, *retsenziyalar*
      * **Durıs**: **`policiyası`**, **`recenziyalar`**
      * **Kelip shıǵıw sebebi**: Qaraqalpaq tiliniń 2016-jılǵı latın imlosında «ц» háribi xalıqaralıq sózlerde turaqlı túrde **`c`** bolıp jazıladı.
+
+9. **#294-#386 Postlar Aralıǵındaǵı Lingvistikalıq, Semantikalıq hám Sintaktikalıq Qátelikler Taliqlaması**:
+
+   - **A. Geologiyalıq hám Tábiyiy Terminlerdiń Buzılıwı («Mars tuqımı» vs «Mars jınısı» - Post #380)**:
+     * **Qátelik**: *mars tuqımı*
+     * **Durıs**: **`mars jınısı`** (yamasa *taw jınısı*)
+     * **Kelip shıǵıw sebebi**: Rus tilindegi «марсианская порода» (geologiyalıq jınıs, mineral qatlam) sózin model qaraqalpaq tilindegi *tuqım* (mal tuqımı, násil, egin tuqımı) sózi menen qáte kalkalaǵan. Tas yamasa planetar qabıq hesh qashan «tuqım» bolmaydı. Geologiyada qaraqalpaq ádebiy tilinde tek **`jınıs`** (*taw jınısları*) dep ataladı.
+
+   - **B. Obyekt hám Harakat Kálkaları («Kólem taraw», «Ullı milletlik» - Post #386)**:
+     * **Qátelik**: *kólem taraw boyınsha*, *Ullı milletlik «Yashil makon»*
+     * **Durıs**: **`kóklemzarlastırıw boyınsha`**, **`Ulıwma milliy «Jasıl makan» joybarı`**
+     * **Kelip shıǵıw sebebi**: Rus tilindegi «по озеленению» sózin mashina *kólem taraw* dep maǵanasız awdarǵan. Qaraqalpaqsha durıs ekvivalent — **`kóklemzarlastırıw`** (yamasa *kóklandırıw*). Sonday-aq, «Общенациональный» (Umummilliy) termini qaraqalpaqsha **`Ulıwma milliy`** boladı, *«Ullı milletlik»* emes. «Yashil» sózi bolsa qaraqalpaqsha **`Jasıl`** dep jazılıwı shárt.
+
+   - **C. Masdar (Infinitive) Jalǵawı: «-egiw» vs «-eguw» (Post #386)**:
+     * **Qátelik**: *terek eguw*
+     * **Durıs**: **`terek egiw`**
+     * **Kelip shıǵıw sebebi**: Qaraqalpaq tilinde feyildiń masdar (infinitive) forması qatań túrde **`-ıw / -iw`** boladı (*egiw, islew, biliw, toltırıw*). Ózbek tilindegi *-ish / -moq* yamasa dialektal *-uw* forması qaraqalpaq tiline kire almaydı.
+
+   - **D. Dawıssızlar Qatańlasıwı hám Dáslepki Singarmonizm («Meteorittiń», «GFR-de» - Post #380, #384)**:
+     * **Qátelik**: *Meteorittıń*, *GFRde*
+     * **Durıs**: **`Meteorittiń`**, **`GFR-de`**
+     * **Kelip shıǵıw sebebi**: *Meteorit* sóziniń sońǵı buwınında jińishke `i` dawıslısı bar. Singarmonizm qaǵıydası boyınsha ilik sepligi juwan `-tıń` emes, jińishke **`-tiń`** bolıwı shárt. Qısqartılǵan atamalarǵa (abbreviatura) seplik jalǵawı defis (`-`) arqalı jalǵanadı: **`GFR-de`**, **`AQSh-ta`**.
+
+   - **E. Leksikalıq Ózbekizmlerdiń Tazalanıwı («tibbiyotta», «tezlestirip» - Post #372)**:
+     * **Qátelik**: *tibbiyotta*, *tezlestirip*
+     * **Durıs**: **`medicinada`**, **`tezletip`**
+     * **Kelip shıǵıw sebebi**: Qaraqalpaq tilinde densawlıqtı saqlaw ilimi ózbek tilindegi «tibbiyot» emes, **`medicina`** dep ataladı. Pánteklik «tezlashtirmoq» feyili bolsa qaraqalpaq tilinde tek **`tezletiw`** bolıp qáliplesken.
+
+   - **F. Huqıqıy Terminologiya: «Aqsha juwıw» vs «Aqsha jıllaw» (Post #362)**:
+     * **Qátelik**: *aqsha juwıw*
+     * **Durıs**: **`aqsha jıllaw`**
+     * **Kelip shıǵıw sebebi**: Ruscha «отмывание денег» (money laundering) sózbe-sóz *juwıw* (suw menen juwıw) emes, qaraqalpaq nızamshılıǵı hám yuridikalıq terminologiyasında rásmiy túrde **`aqsha jıllaw`** (nızamsız dáramatlardı legallastırıw) dep belgilengen.
+
+   - **G. Qospa Háripler hám Gomoglifler («máhälläsi» - Post #386)**:
+     * **Qátelik**: *máhälläsi* (tatarcha/ruscha «ä» háribi aralasqan)
+     * **Durıs**: **`máhállesi`**
+     * **Kelip shıǵıw sebebi**: Qaraqalpaq latın alifbosında «ä» háribi ulıwma joq, tek akutlı `á` háribi bar. *Máhálle* sózine úshinshi betlik tartım jalǵawı `-si` qosılǵanda, sóz **`máhállesi`** bolıp jazıladı.
