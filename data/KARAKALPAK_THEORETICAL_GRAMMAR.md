@@ -295,3 +295,50 @@ Mashinalıq awdarma hám neyrotarqaǵıshlar (LLM) qaraqalpaq tiline awdarma jas
      * **Qátelik**: *ashildi* ➔ **`ashıldı`** (singarmonizm boyınsha juwan `-dı`).
      * **Qátelik**: *taldap shıǵıw* ➔ **`tallap shıǵıw`** (qaraqalpaq tilindegi `ld` ➔ `ll` assimilyaciyası: qaraqalpaqsha *tallaw* boladı, qazaqsha *taldaw* emes).
      * **Qátelik**: *Tarix* ➔ **`Tariyx`** (qaraqalpaq ádebiy tilinde `iy` diftongı menen jazıladı).
+
+8. **Oxırǵı 50 Post Boyınsha Anıqlanǵan Lingvistikalıq hám Sintaktikalıq Qátelikler Taliqlaması**:
+
+   - **A. Sintaktikalıq Inversiya hám Qarsı Máni Payda Bolıwı (Post #288)**:
+     * **Qátelik**: *koala balasınıń ólimshi qushaǵınan piton illetin qutqarıp qaldı*
+     * **Durıs**: **`piton jılanınıń ólimshi qushaǵınan koala balasın qutqarıp qaldı`**
+     * **Kelip shıǵıw sebebi**: Mashina awdarmasında (LLM) subyekt penen obyekt orın almasıp ketken. Inglisshe *«saved the koala cub from the deadly grip of a python»* gápindegi mánis teskeri aylanıp, goya piton qutqarılǵanday bolıp qalǵan. Bunnan tısqarı, *piton jılanı* ornına orınsız *piton illeti* (keselligi/illeti) sózi qollanılǵan. Obyekt penen subyekt qatnasın durıs belgilew shárt.
+
+   - **B. Dawıssızlar Qatańlasıwı (Tabıs Sepligi Assimilyaciyası - Post #288)**:
+     * **Qátelik**: *jırtqıshdı*
+     * **Durıs**: **`jırtqıshtı`**
+     * **Kelip shıǵıw sebebi**: Qaraqalpaq tilinde qatań dawıssızlardan keyin (p, t, s, k, q, sh, x) tabıs sepligi qatań `-tı / -ti` bolıp jalǵanadı. Uyań `-dı` qosılıwı orfografiyalıq nızamǵa qarsı.
+
+   - **C. Leksikalıq Fonetika («iyt» vs «ıyt», «haywan» vs «xaywan»)**:
+     * **Qátelik**: *ıytı menen*, *xaywan*
+     * **Durıs**: **`iyti menen`**, **`haywan`**
+     * **Kelip shıǵıw sebebi**: Qaraqalpaq ádebiy tilinde «it» sózi tek jińishke vokal menen **`iyt`** túrinde jazıladı (`ı` emes). Al arab tilinen ózlesken *haywan* sózi qatań `x` penen emes, jumsaq **`h`** arqalı tańbalanadı.
+
+   - **D. Ózlespe Sózlerdegi Fonetikalıq Biybereketsizlik (Post #286)**:
+     * **Qátelik**: *p'edestaldıń*
+     * **Durıs**: **`pedestaldıń`**
+     * **Kelip shıǵıw sebebi**: Rus tilindegi jumsartıw belgisi («ь» – пьедестал) qaraqalpaq latın imlosına apostrof bolıp ótpeydi. Qaraqalpaq tiliniń 2016-jılǵı orfografiyalıq qaǵıydalarına kóre, bunday sózler tikkeley **`pedestal`** dep jazıladı.
+
+   - **E. Qazaqsha «Jele» Kálkası (Post #284)**:
+     * **Qátelik**: *jelelik arza*
+     * **Durıs**: **`elektronlıq arza`**
+     * **Kelip shıǵıw sebebi**: Russha «сетевое / электронное заявление» sózin qazaqsha kálkalap, *jele* (órmekshi torı / tor) sózinen *jelelik arza* dep jasalma sóz islengen. Qaraqalpaq tilindegi rásmiy termin — **`elektronlıq arza`**.
+
+   - **F. Lotin Tekstinde Kirill Gomoglifleri (Post #277)**:
+     * **Qátelik**: *аydaǵı* (basındaǵı `а` – kirill U+0430)
+     * **Durıs**: **`aydaǵı`** (latın `a` – U+0061)
+     * **Kelip shıǵıw sebebi**: Neyrotarmoqlar hár qıylı tildagi korpuslardan paydalanǵanda, sırtqı kórinisi birdey bolǵan kirill hám latın háriplerin shatastırıp jiberedi. Barlıq kirill gomoglifleri latınǵa tolıq unifikaciya qılınıwı shárt.
+
+   - **G. Qospa Terminlerdiń Qopal Buralıwı (Post #271)**:
+     * **Qátelik**: *cirkumbinnıń ekzoplaneta*
+     * **Durıs**: **`cirkumbinar ekzoplaneta`**
+     * **Kelip shıǵıw sebebi**: Russha «циркумбинарная экзопланета» (eki juldız átirapında aylanıwshı planeta) ilimiy termini model tárepinen mánisi túsip qalıp, *cirkumbinnıń* dep buzılǵan.
+
+   - **H. Singarmonizm: Juwan Ozaqqa Jińishke Seplik Qosıw (Post #267, #271)**:
+     * **Qátelik**: *kadastrdi*, *signaldi*
+     * **Durıs**: **`kadastrdı`**, **`signaldı`**
+     * **Kelip shıǵıw sebebi**: *Kadastr* hám *signal* sózleriniń sońǵı buwınında juwan `a` dawıslısı bar. Singarmonizm qaǵıydası boyınsha tabıs sepligi jińishke `-di` emes, juwan **`-dı`** bolıwı shárt.
+
+   - **I. 2016-jılǵı Latın Orfografiyasınıń 'c' Háribi (Post #270, #121)**:
+     * **Qátelik**: *politsiyası*, *retsenziyalar*
+     * **Durıs**: **`policiyası`**, **`recenziyalar`**
+     * **Kelip shıǵıw sebebi**: Qaraqalpaq tiliniń 2016-jılǵı latın imlosında «ц» háribi xalıqaralıq sózlerde turaqlı túrde **`c`** bolıp jazıladı.
