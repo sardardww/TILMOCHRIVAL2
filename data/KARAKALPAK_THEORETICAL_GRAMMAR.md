@@ -142,6 +142,11 @@ Awızeki tilde yamasa mashinalıq awdarmada qaraqalpaq tili kóbinese qońsılas
 | *kútew* | **kútiw** | kútiw waqtı |
 | *sebepti* | **sebepli** | sol sebepli |
 | *buntan aldın* | **bunnan aldın** | bunnan aldın qabıllanǵan |
+| *alımlar* | **ilimpazlar** | ilimpazlar izertlewi (Kazakh: ғалымдар) |
+| *wáqıya* | **waqıya** | bolǵan waqıya |
+| *abıroylı* | **abıraylı** | abıraylı sıylıq |
+| *departamendi* | **departamenti** | qorǵaw departamenti |
+| *kitniń* | **kittiń** | kittiń ólimi (assimilyaciya) |
 
 ### B. Ózbek tilinen kirip ketetuǵın sózler (Ózbekizmler):
 | Qáte (Ózbekshe forma) | Durıs (Qaraqalpaqsha ádebiy forma) |
