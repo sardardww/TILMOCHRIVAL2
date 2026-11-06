@@ -167,6 +167,23 @@ STATIC_SLIPS_PATTERNS: List[Tuple[str, str]] = [
     (r"\bZıyanlan([a-zıóúáǵń]*)\b", r"Zaqımlan\1"),
     (r"\bbarlıǵı tórt saat\b", "barı-joǵı tórt saat"),
 
+    # Audited slips from latest 50 posts (#113-#294)
+    (r"\bp'edestal([a-zıóúáǵń]*)\b", r"pedestal\1"),
+    (r"\bP'edestal([a-zıóúáǵń]*)\b", r"Pedestal\1"),
+    (r"\bjelelik arza\b", "elektronlıq arza"),
+    (r"\bkadastrdi\b", "kadastrdı"),
+    (r"\bKadastrdi\b", "Kadastrdı"),
+    (r"\bsignaldi\b", "signaldı"),
+    (r"\bSignaldi\b", "Signaldı"),
+    (r"\bjırtqıshdı\b", "jırtqıshtı"),
+    (r"\bıytı menen\b", "iyti menen"),
+    (r"\baqsha jıliwda\b", "aqsha jıllawda"),
+    (r"\bcirkumbinnıń ekzoplaneta\b", "cirkumbinar ekzoplaneta"),
+    (r"\bretsenziy([a-zıóúáǵń]*)\b", r"recenziy\1"),
+    (r"\bRetsenziy([a-zıóúáǵń]*)\b", r"Recenziy\1"),
+    (r"\btastiyıqlaw([a-zıóúáǵń]*)\b", r"tastıyıqlaw\1"),
+    (r"\bTastiyıqlaw([a-zıóúáǵń]*)\b", r"Tastıyıqlaw\1"),
+
     # Suffixes & Predicatives (Singarmonizm and Case Assimilation)
     (r"\bilimti\b", "ilimdi"),
     (r"\bилимти\b", "илимди"),
