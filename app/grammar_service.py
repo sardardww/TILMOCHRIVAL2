@@ -35,6 +35,22 @@ def load_academic_grammar_text() -> str:
 
 # Pre-compiled static rules for phonology, loanwords, and toponyms
 STATIC_SLIPS_PATTERNS: List[Tuple[str, str]] = [
+    # Foreign Latin letters & umlauts (Tatar, Turkmen, Turkish, German)
+    (r"ä", "á"),
+    (r"Ä", "Á"),
+    (r"ö", "ó"),
+    (r"Ö", "Ó"),
+    (r"ü", "ú"),
+    (r"Ü", "Ú"),
+    (r"ğ", "ǵ"),
+    (r"Ğ", "Ǵ"),
+    (r"ş", "sh"),
+    (r"Ş", "Sh"),
+    (r"ç", "ch"),
+    (r"Ç", "Ch"),
+    (r"ñ", "ń"),
+    (r"Ñ", "Ń"),
+    (r"İ", "I"),
     # Core Kazakh/Uzbek false friends
     (r"\bjastar([a-zıóúáǵń]*)\b", r"jaslar\1"),
     (r"\bJastar([a-zıóúáǵń]*)\b", r"Jaslar\1"),
@@ -274,6 +290,23 @@ def fix_common_grammatical_slips(text: str) -> str:
 
     result = text
     
+    # 0. Strict Character Normalization (Umlaut & Cyrillic homoglyph sanitizer)
+    FOREIGN_CHARS_MAP = {
+        'ä': 'á', 'Ä': 'Á',
+        'ö': 'ó', 'Ö': 'Ó',
+        'ü': 'ú', 'Ü': 'Ú',
+        'ğ': 'ǵ', 'Ğ': 'Ǵ',
+        'ş': 'sh', 'Ş': 'Sh',
+        'ç': 'ch', 'Ç': 'Ch',
+        'ñ': 'ń', 'Ñ': 'Ń',
+        'İ': 'I',
+        'ë': 'e', 'Ë': 'E',
+        'а': 'a', 'е': 'e', 'о': 'o', 'р': 'p', 'с': 'c', 'у': 'y', 'х': 'x',
+        'А': 'A', 'В': 'B', 'Е': 'E', 'К': 'K', 'М': 'M', 'Н': 'H', 'О': 'O', 'Р': 'P', 'С': 'C', 'Т': 'T'
+    }
+    for foreign_ch, safe_ch in FOREIGN_CHARS_MAP.items():
+        result = result.replace(foreign_ch, safe_ch)
+
     # 1. Apply dynamic rules parsed straight from KARAKALPAK_THEORETICAL_GRAMMAR.md
     try:
         dynamic_rules = extract_dynamic_rules_from_markdown()
