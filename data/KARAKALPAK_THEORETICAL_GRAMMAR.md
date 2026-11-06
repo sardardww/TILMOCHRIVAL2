@@ -257,3 +257,41 @@ Mashinalıq awdarma hám neyrotarqaǵıshlar (LLM) qaraqalpaq tiline awdarma jas
    - **Qátelik**: *jas basqan adamlar* ➔ **`kekseler / jas úlkenler`** (russha «пожилые люди» sóziniń sózbe-sóz qátelik kalkası).
    - **Qátelik**: *shıń saatları* ➔ **`eń tıǵız saatlar`** (inglizshe «rush hour» / russha «часы пик» sózindegi «пик»ti tawdıń shıńı dep qáte kalkalaw).
    - **Qátelik**: *biytarap ońay emes arada* ➔ **`sońǵı waqıtlarda`** (quramalı kontekstti orınsız awdarıw).
+
+7. **Post #294 hám #290-#293 Boyınsha Tereń Lingvistikalıq Hám Semantikalıq Analiz**:
+
+   - **A. Semantikalıq Psevdo-Antonim («Jabıńqı» vs «Qaplama»)**:
+     * **Qátelik**: *Jabıńqı* (Russha: «покрытие / гидрогелевое покрытие»).
+     * **Durıs**: **`Qaplama`** (yamasa **`Gidrogel qaplaması`**).
+     * **Kelip shıǵıw sebebi**: Rus tilindegi «покрытие» (jabıw, qaplaw) feyilinen jasalǵan atlıqtı awdarǵanda, model qaraqalpaq tilindegi *jabıńqı* sózin qollanǵan. Biraq qaraqalpaq tilinde *jabıńqı* sózi materiallıq qaplamanı EMES, psixologiyalıq jaǵdaydı yamasa hawa-rayın ańlatadı: «qabaǵı jabıńqı» (túnergen, keypi joq, depressiyalıq halat), «hawa jabıńqı» (bultlı). Medicinalıq hám texnikalıq obyektti qaplawshı qatlam qaraqalpaqsha tek **`qaplama`** dep ataladı.
+
+   - **B. Tiri Toqıma vs Tınıq Toqıma («tınıq toqymalar»)**:
+     * **Qátelik**: *tınıq toqymalar* (Russha: «живые ткани»).
+     * **Durıs**: **`tiri toqımalar`**.
+     * **Kelip shıǵıw sebebi**: Eki qátelik birikpesi: 1) Model «живой» sózin «тихий/чистый» dep adasıp *tınıq* (tınıq suw, tınıq hawa) dep qáte semantika bergen. 2) Qaraqalpaq latın imlosında `y` háribi rus tilindegi «ы» emes, «й» háribin ańlatadı. Sonlıqtan *toqymalar* sózi fonetikalıq hám orfografiyalıq tárepten qopal qátelik esaplanadı. Biologiyalıq organikalıq toqıma — **`tiri toqıma`** boladı.
+
+   - **C. «Kúyik» sóziniń deformaciyası («kútik»)**:
+     * **Qátelik**: *kútik* (Russha: «ожоги»).
+     * **Durıs**: **`kúyik`** (kúyik jaraqatları).
+     * **Kelip shıǵıw sebebi**: Qaraqalpaq tilindegi *kúyiw* feyilinen jasalǵan atlıq — *kúyik*. Mashina awdarmasında konsonantlar almashıp, tilde ulıwma bolmaǵan *kútik* degen jasalma sóz payda bolǵan.
+
+   - **D. Tabıs Sepligi Sintaksisi (Grammatikalıq qátelik)**:
+     * **Qátelik**: *jaraqatlarınıń ... jabatuǵın*
+     * **Durıs**: **`jaraqatlardı ... jabatuǵın`**
+     * **Kelip shıǵıw sebebi**: Sintaktikalıq basqarıw qáteligi. `Jabatuǵın` keltirindi feyili (participle) ótimli feyil bolǵanlıqtan, ózinen aldınǵı tolıqlawıshtı Ilik sepliginde (`-nıń`) emes, Tabıs sepliginde (`-dı / -ti / -nı`) talap etedi. Ilik sepligi qoyılǵanda sóz dizbegi iyelik mánisine aylanıp, sintaksislik baylanıs úziledi.
+
+   - **E. Xalıqaralıq terminlerde 'k' hám 'q'**:
+     * **Qátelik**: *kletqalardı*
+     * **Durıs**: **`kletkalardı`**
+     * **Kelip shıǵıw sebebi**: Qaraqalpaq tilinde xalıqaralıq (rus hám grek-latın) ózlespe sózlerde `k` háribi jińishke de, juwan da buwınlarda óz qálpinde `k` bolıp jazıladı (*kletka, traktor, leksika, texnika*). Olardı qatań `q` menen jazıw imlo qaǵıydalarına ziyan keltiredi.
+
+   - **F. Restriktivlik Kvantifikatorı («Barlıǵı» vs «Barı-joǵı»)**:
+     * **Qátelik**: *barlıǵı tórt saat* (Russha: «всего 4 часа»).
+     * **Durıs**: **`barı-joǵı tórt saat`**.
+     * **Kelip shıǵıw sebebi**: *Barlıǵı* sózi qaraqalpaqsha «hámmesi, barlıq sani» (total, sum) degen mánisti ańlatadı. Sheklew, azlıq («всего лишь») mánisin beriw ushın bolsa qaraqalpaq tilinde tek **`barı-joǵı`** birikpesi qollanıladı.
+
+   - **G. Singarmonizm hám Fonetikalıq Assimilyaciya (Post #290)**:
+     * **Qátelik**: *ilimlerinin' kandidati* ➔ **`ilimleriniń kandidatı`** (`kandidat` sózi juwan buwınlı bolǵanlıqtan, ilik/tartım jalǵawı da juwan `-ı` bolıwı shárt; `n'` háribi 2016-jılǵı alfavit boyınsha `ń`ǵa almastırıladı).
+     * **Qátelik**: *ashildi* ➔ **`ashıldı`** (singarmonizm boyınsha juwan `-dı`).
+     * **Qátelik**: *taldap shıǵıw* ➔ **`tallap shıǵıw`** (qaraqalpaq tilindegi `ld` ➔ `ll` assimilyaciyası: qaraqalpaqsha *tallaw* boladı, qazaqsha *taldaw* emes).
+     * **Qátelik**: *Tarix* ➔ **`Tariyx`** (qaraqalpaq ádebiy tilinde `iy` diftongı menen jazıladı).
