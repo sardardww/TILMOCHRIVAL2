@@ -154,6 +154,13 @@ Awızeki tilde yamasa mashinalıq awdarmada qaraqalpaq tili kóbinese qońsılas
 | *oqsham* | **kesh / keshki waqıt** | keshki waqıtta (Uzbekism: oqshom) |
 | *xizmet* | **xızmet** | xızmet kórsetiw (Karakalpak: ı) |
 | *baslı qalaq* | **kino platforması** | qáte kalka awdarma |
+| *aksiyalar / aksiyalardı* | **akciyalar / akciyalardı** | 2016-jılǵı 'c' qoidası (NEVER 'ks') |
+| *ádeyir* | **ádeywir** | orfografiya ('w' háribi túsip qalǵan) |
+| *derek-orayı / derek-orayları* | **maǵlıwmatlar orayı** | data center (derek = source, maǵlıwmat = data) |
+| *shamamen* | **shama menen** | ajıratıp jazıladı |
+| *shıntlap* | **shın mánisinde / shınında da** | qazaqizm (шындап) ➔ qaraqalpaqsha ádebiy forma |
+| *topılıs* | **hújim** | qurallı hújim (qazaqizm / dialekt) |
+| *jas basqan adamlar* | **kekseler / jas úlkenler** | jas basqan emes, kekseler |
 
 ### B. Ózbek tilinen kirip ketetuǵın sózler (Ózbekizmler):
 | Qáte (Ózbekshe forma) | Durıs (Qaraqalpaqsha ádebiy forma) |
