@@ -147,6 +147,13 @@ Awızeki tilde yamasa mashinalıq awdarmada qaraqalpaq tili kóbinese qońsılas
 | *abıroylı* | **abıraylı** | abıraylı sıylıq |
 | *departamendi* | **departamenti** | qorǵaw departamenti |
 | *kitniń* | **kittiń** | kittiń ólimi (assimilyaciya) |
+| *prezidendi* | **prezidenti** | Paragvay prezidenti (Russian -t + -i) |
+| *jasawshı / jasawshıları* | **turǵın / turǵınları** | qala turǵınları (Kazakhism: жасаушылар) |
+| *kinoqumar* | **kinosúyiwshi** | kinosúyiwshiler ushın (Uzbekism: kinoqumor) |
+| *dereklar* | **derekler** | maǵlıwmat derekleri (Singarmonizm: e-e) |
+| *oqsham* | **kesh / keshki waqıt** | keshki waqıtta (Uzbekism: oqshom) |
+| *xizmet* | **xızmet** | xızmet kórsetiw (Karakalpak: ı) |
+| *baslı qalaq* | **kino platforması** | qáte kalka awdarma |
 
 ### B. Ózbek tilinen kirip ketetuǵın sózler (Ózbekizmler):
 | Qáte (Ózbekshe forma) | Durıs (Qaraqalpaqsha ádebiy forma) |
