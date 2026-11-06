@@ -131,6 +131,17 @@ Awızeki tilde yamasa mashinalıq awdarmada qaraqalpaq tili kóbinese qońsılas
 | *quwattı* | **quwatlı** | quwatlı kárxana |
 | *qáwipti* | **qáwipli** | qáwipli jaǵday |
 | *qarap* | **qaray** | hawa rayına qaray |
+| *paneliler / panelgeler* | **paneller / panellerge** | quyash panelleri |
+| *dvigatil* | **dvigatel** | jańa dvigatel |
+| *Bizinsiz* | **Biziń** | Biziń planetamız |
+| *obyektsti* | **obyektti** | ilimiy obyektti |
+| *asteroyid* | **asteroid** | asteroid qáwipi |
+| *átirindegi* | **átirapındaǵı** | jer átirapındaǵı |
+| *tirishilik* | **tirshilik** | tirshilik deregi |
+| *tábiyǵiy* | **tábiyiy** | tábiyiy resurslar |
+| *kútew* | **kútiw** | kútiw waqtı |
+| *sebepti* | **sebepli** | sol sebepli |
+| *buntan aldın* | **bunnan aldın** | bunnan aldın qabıllanǵan |
 
 ### B. Ózbek tilinen kirip ketetuǵın sózler (Ózbekizmler):
 | Qáte (Ózbekshe forma) | Durıs (Qaraqalpaqsha ádebiy forma) |
@@ -157,6 +168,19 @@ Awızeki tilde yamasa mashinalıq awdarmada qaraqalpaq tili kóbinese qońsılas
 | *korxona* | **kárxana** |
 | *ishlab chiqarish* | **islep shıǵarıw** |
 | *hamkorlik* | **birge islesiw** |
+| *prezidendi* | **prezidenti** |
+| *Shavqat* | **Shavkat** |
+| *bazıxana / tamoxana* | **bajıxana** |
+| *xalıq aralıq* | **xalıqaralıq** |
+| *jumısqar sapar* | **jumıs saparı** |
+| *ádministraciya* | **administraciya** |
+| *menedjerdiler* | **menedjerler** |
+| *napaqá* | **napaqa** |
+| *konkurenciya* | **báseki / básekileslik** |
+| *Bunga* | **Buǵan** |
+| *dodalawda* | **talqılamaqta** |
+| *ushırıw (joybardı)* | **iske qosıw** |
+| *hámde* | **hám de** |
 
 ### C. 2016-jılǵı Rásmiy Qaraqalpaq Latın Alfavitiniń Ózgeshelikleri:
 1. **Akutlı háripler**: `Á á`, `Ǵ ǵ`, `Ń ń`, `Ó ó`, `Ú ú`.
