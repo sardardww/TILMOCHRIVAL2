@@ -379,3 +379,27 @@ Mashinalıq awdarma hám neyrotarqaǵıshlar (LLM) qaraqalpaq tiline awdarma jas
      * **Qátelik**: *máhälläsi* (tatarcha/ruscha «ä» háribi aralasqan)
      * **Durıs**: **`máhállesi`**
      * **Kelip shıǵıw sebebi**: Qaraqalpaq latın alifbosında «ä» háribi ulıwma joq, tek akutlı `á` háribi bar. *Máhálle* sózine úshinshi betlik tartım jalǵawı `-si` qosılǵanda, sóz **`máhállesi`** bolıp jazıladı.
+
+10. **Qaraqalpaq Latın Alifbosında Bolmaǵan Jat Háriplerdiń («ä», «ö», «ü», «ğ») Kirip Ketiw Sebepleri hám Qatań Filtrlash Sisteması**:
+
+   - **A. «ä» Háribiniń Kelip Shıǵıw Sebebi (LLM BPE Token Leakage)**:
+     * **Qátelik**: *máhälläsi*, *şähár*, *mährem*
+     * **Durıs**: **`máhállesi`**, **`sháher`**, **`máhrem`**
+     * **Nege bunday boldı?**:
+       1. Neyrotarmoqlar (LLM: Gemini, GPT, Claude) kóp tilli (multilingual) korpuslar tiykarında oqıtıladı. Turkiy tiller sistemasında (tatar, túrkmen, ázerbayjan) ashıq jińishke /æ/ dawıslısı orfografiyalıq tárepten «ä» háribi arqalı jazıladı (mısalı, túrkmenshe: *şäher*, *mährem*; tatarshe: *мәхәллә / mäxällä*).
+       2. Qaraqalpaq tiliniń 2016-jılǵı rásmiy latın alifbosında bolsa /æ/ dawıslısı qatań túrde akutlı **`á`** háribi arqalı tańbalanadı.
+       3. Mashinalıq awdarma yamasa LLM tekst jaratqanda, qaraqalpaqsha /æ/ fonemasın generaciya qılıw barısında kóp tilli BPE tokenizatorında eń kóp ushırasatuǵın «ä» háribi shıǵıp ketken.
+       4. Burınǵı kod bazasında bolsa kirill háripleri ushın transliteraciya bar bolǵanı menen, dál «ä» latın háribin «á»ǵa avtomatikalıq o‘girish qoidasi belgilengen emes edi.
+
+   - **B. Bunday Qáteliktiń Qayta Qaytalanbawı Ushın Engizilgen Qatań Filtr (Deterministic Sanitizer)**:
+     * Tizimge hámme tekstlerdi nashr etiwden aldın qaraqalpaq alifbosına tolıq unifikaciya qılıwshı qatań simvol-filtri (Character-Level Normalizer) integraciya qılındı:
+       - `ä, Ä` ➔ **`á, Á`**
+       - `ö, Ö` ➔ **`ó, Ó`**
+       - `ü, Ü` ➔ **`ú, Ú`**
+       - `ğ, Ğ` ➔ **`ǵ, Ǵ`**
+       - `ş, Ş` ➔ **`sh, Sh`**
+       - `ç, Ç` ➔ **`ch, Ch`**
+       - `ñ, Ñ` ➔ **`ń, Ń`**
+       - `İ` ➔ **`I`**
+       - Kirill gomoglifleri (`а, е, о, р, с, у, х` h.t.b.) ➔ tolıq latın ekvivalentlerine.
+     * Bul filtr `cloud_poster.py` (nashr aldınan) hám `app/grammar_service.py` (tarjima aldınan) kodında deterministik túrde iske túsedi. Nátiyjede qaraqalpaq tilinde bolmaǵan hesh qanday jat háripler (ä, ö, ü, ğ, ş, ç) bazadan sırtqa shıǵa almaydı.
