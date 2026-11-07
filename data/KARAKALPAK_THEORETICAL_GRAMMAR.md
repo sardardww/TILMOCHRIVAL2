@@ -403,3 +403,44 @@ Mashinalıq awdarma hám neyrotarqaǵıshlar (LLM) qaraqalpaq tiline awdarma jas
        - `İ` ➔ **`I`**
        - Kirill gomoglifleri (`а, е, о, р, с, у, х` h.t.b.) ➔ tolıq latın ekvivalentlerine.
      * Bul filtr `cloud_poster.py` (nashr aldınan) hám `app/grammar_service.py` (tarjima aldınan) kodında deterministik túrde iske túsedi. Nátiyjede qaraqalpaq tilinde bolmaǵan hesh qanday jat háripler (ä, ö, ü, ğ, ş, ç) bazadan sırtqa shıǵa almaydı.
+
+
+---
+
+## 11. Sońǵı Postlar (#381 - #399) Lingvistikalıq Auditi hám Morfo-Sintaktik Qáteliklerdiń Kelip Shıǵıw Sebepleri
+
+Ushbu bólimde Telegram kanalda nashr etilgen sońǵı 8 ta postta (#381, #382, #383, #384, #385, #386, #398, #399) ushırasqan grammatikalıq, leksikalıq hám orfografiyalıq qátelikler hám olardıń payda bolıw faktorları tahlil etiledi:
+
+### 1. Singarmonizm hám Fonetika (Vowel Harmony & Orthography)
+* **Qátelik**: engiziwdıń (Post #399) ➔ **Durıs**: **engiziwdiń**
+  - **Kelip shıǵıw sebebi**: *engiziw* sózindegi barlıq dawıslılar jińishke (e, i). Singarmonizm qonuniyatiga ko‘ra, jińishke buwınlı sózge juwan ilik sepligi (-dıń) ulanishi mumkin emas. Faqat jińishke **-diń** ulanishi lozim.
+* **Qátelik**: 	echnologiyalıq (Post #399) ➔ **Durıs**: **	exnologiyalıq**
+  - **Kelip shıǵıw sebebi**: Ingliz tilidagi «tech-» morfemasi (ch) to‘g‘ridan-to‘g‘ri o‘tib ketgan. Qoraqalpoq 2016-yilgi lotin imlosida /x/ tovushi doimo **x** harfi orqali yoziladi.
+* **Qátelik**: Ástanalıq process (Post #399) ➔ **Durıs**: **Astana procesi**
+  - **Kelip shıǵıw sebebi**: Atoqli otlarga asossiz urg‘u qo‘yish (giperkorreksiya / model halyusinatsiyasi). Shuningdek, qoraqalpoq tilida o‘zlashma so‘zlardagi qo‘sh undoshlar bir undoshga qisqaradi (*process* ➔ **proces**).
+
+### 2. Leksik Polisemiya va Ruscha Kalka (Lexical Polysemy & False Friends)
+* **Qátelik**: qadaǵalaw ólshemleri (Post #398) ➔ **Durıs**: **qadaǵalaw ilajları / sharaları**
+  - **Kelip shıǵıw sebebi**: Ruscha «меры контроля» iborasidagi ko‘p ma’noli *меры* so‘zini noto‘g‘ri kalkalash. Qoraqalpoq tilida *ólshem* faqat fizik o‘lchov birligi (metr, hajm, razmer). Huquqiy/ma’muriy chora-tadbirlar esa faqat **ilajlar** yoki **sharalar** deb ataladi.
+* **Qátelik**: kútip barıw (Post #386) ➔ **Durıs**: **kútip-baplaw**
+  - **Kelip shıǵıw sebebi**: Ruscha «ухаживать за растениями» kontekstini noto‘g‘ri tarjima qilish. *Kútiw* — kutish (wait), lekin ko‘chat va ekinlarga agrotexnik qarash qoraqalpoq tilida **kútip-baplaw** (yoki *parvarishlew*) deyiladi.
+* **Qátelik**: qarıydarlardıń huqıqların (Post #398) ➔ **Durıs**: **	utınıwshılardıń huqıqların**
+  - **Kelip shıǵıw sebebi**: Ruscha «права потребителей». Kommunal, gaz va elektr sohasida xizmat oluvchilar yuridik tilda *qarıydar* (bozor/do‘kon xaridori) emas, **	utınıwshılar** (iste’molchilar) hisoblanadi.
+* **Qátelik**: Ishki isler uyımları (Post #398) ➔ **Durıs**: **Ishki isler organları**
+  - **Kelip shıǵıw sebebi**: *Uyım* — nodavlat tashkilot, jamiyat, assotsiatsiya (uyushma). Huquqni muhofaza qiluvchi davlat institutlari esa qoraqalpoq tilida doimo **organlar** deb ataladi.
+* **Qátelik**: 	ájiriybeli saparın (Post #399) ➔ **Durıs**: **jumıs saparın**
+  - **Kelip shıǵıw sebebi**: Ruscha «деловой визит». *Tájiriybeli* — tajribali shaxs (experienced person). Davlat rahbarining safari esa **jumıs saparı** yoki **ámeliy sapar** deb tarjima qilinadi.
+* **Qátelik**: qupıya orın (Post #382) ➔ **Durıs**: **jasırın orın / jasırın jay**
+  - **Kelip shıǵıw sebebi**: Ruscha «тайник». Maxfiy ma’lumot *qupıya*, moddiy yashiringan joy/bunker esa **jasırın orın** deyiladi.
+* **Qátelik**: qádemler taslamaqta (Post #383) ➔ **Durıs**: **háreket etpekte / ilajlar kórmekte**
+  - **Kelip shıǵıw sebebi**: Ruscha «предпринимать шаги» iborasining so‘zma-so‘z kalkasi. Siyosiy/huquqiy harakatlar **ilajlar kórmekte** deb ifodalanadi.
+
+### 3. Morfosintaksis va Kelishik Muvofiqligi (Morphosyntax & Case Concord)
+* **Qátelik**: urlıqlardıń júze keliwine (Post #398) ➔ **Durıs**: **urlıqlardıń júzege keliwine**
+  - **Kelip shıǵıw sebebi**: Turg‘un frazeologiyadagi yo‘nalish (barıs) kelishigi -ge affiksining tushib qolishi (*júzege keliw*).
+* **Qátelik**: 	ámiyinlewdi, ... jol qoymaw hám de ... tapsırdı (Post #398) ➔ **Durıs**: **...jol qoymawdı hám de ... tapsırdı**
+  - **Kelip shıǵıw sebebi**: Uyushiq bo‘laklarda tushum (tabıs) kelishigi affiksining uzilishi (*támiyinlewdi, jol qoymawdı, tekseriwdi tapsırdı*).
+* **Qátelik**: máselerin (Post #399) ➔ **Durıs**: **máselelerin**
+  - **Kelip shıǵıw sebebi**: O‘zakdagi -le- morfemasi tushib qolib, so‘z noto‘g‘ri qisqargan (*másele + ler + i + n*).
+* **Qátelik**: 	ekseriw barısında (Post #385) ➔ **Durıs**: **	ergew barısında**
+  - **Kelip shıǵıw sebebi**: Sud-jinoyat kontekstida tergov jarayoni *tekseriw* (auditorlik tekshiruvi) emas, **	ergew** deb yuritiladi.
