@@ -295,22 +295,22 @@ class PersistentDraftQueueService:
             self.save_state()
             return False
 
-    def mark_published(self, draft_id: int, channel_message_id: int) -> None:
+    def mark_published(self, draft_id: Optional[int] = None, channel_message_id: int = 0) -> None:
         with self.lock:
             active = self.state.get("active_draft")
-            if active and active.get("id") == draft_id:
+            if active:
                 clean = active.get("url")
-                if clean:
+                if clean and clean not in self.state.get("blacklisted_urls", []):
                     self.state.setdefault("blacklisted_urls", []).append(clean)
                 self.state["active_draft"] = None
         self.save_state()
 
-    def mark_rejected(self, draft_id: int, reason: str = "Admin rejected via button") -> None:
+    def mark_rejected(self, draft_id: Optional[int] = None, reason: str = "Admin rejected via button") -> None:
         with self.lock:
             active = self.state.get("active_draft")
-            if active and active.get("id") == draft_id:
+            if active:
                 clean = active.get("url")
-                if clean:
+                if clean and clean not in self.state.get("blacklisted_urls", []):
                     self.state.setdefault("blacklisted_urls", []).append(clean)
                 self.state["active_draft"] = None
         self.save_state()
