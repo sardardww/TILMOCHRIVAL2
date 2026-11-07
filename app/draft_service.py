@@ -208,7 +208,22 @@ class PersistentDraftQueueService:
                 logger.info(f"Draft #{draft_id} added to pending queue (Total in queue: {pending_count}). Admin currently has active post.")
                 return {"status": "queued", "draft_id": draft_id, "pending_in_queue": pending_count}
 
-    def _deliver_draft_to_telegram(self, draft: dict[str, Any]) -> bool:
+        def get_target_moderation_chat_id(self) -> str:
+        with self.lock:
+            mod_chat = self.state.get("moderation_chat_id")
+            if mod_chat:
+                return str(mod_chat)
+        return str(settings.ADMIN_CHAT_ID)
+
+    def set_moderation_chat(self, chat_id: Any, title: str = ""):
+        with self.lock:
+            self.state["moderation_chat_id"] = str(chat_id)
+            if title:
+                self.state["moderation_chat_title"] = title
+        self.save_state()
+        logger.info(f"Target moderation chat set to: {chat_id} ({title})")
+
+def _deliver_draft_to_telegram(self, draft: dict[str, Any]) -> bool:
         did = draft["id"]
         dcap = draft["caption_html"]
         mtype = draft.get("media_type", "photo")
@@ -233,7 +248,7 @@ class PersistentDraftQueueService:
         # 1. Try sending video
         if mtype == "video" and murl:
             res = call_telegram("sendVideo", {
-                "chat_id": settings.ADMIN_CHAT_ID,
+                "chat_id": self.get_target_moderation_chat_id(),
                 "video": murl,
                 "caption": dcap,
                 "parse_mode": "HTML",
@@ -247,7 +262,7 @@ class PersistentDraftQueueService:
                 res = call_telegram(
                     "sendPhoto",
                     {
-                        "chat_id": settings.ADMIN_CHAT_ID,
+                        "chat_id": self.get_target_moderation_chat_id(),
                         "caption": dcap,
                         "parse_mode": "HTML",
                         "reply_markup": json.dumps(reply_markup)
@@ -260,7 +275,7 @@ class PersistentDraftQueueService:
         # 3. Fallback to sending photo URL
         if not res.get("ok") and murl and murl.startswith("http"):
             res = call_telegram("sendPhoto", {
-                "chat_id": settings.ADMIN_CHAT_ID,
+                "chat_id": self.get_target_moderation_chat_id(),
                 "photo": murl,
                 "caption": dcap,
                 "parse_mode": "HTML",
