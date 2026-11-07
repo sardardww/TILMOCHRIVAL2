@@ -2,48 +2,18 @@ import base64
 import json
 import logging
 import os
-import sqlite3
+import threading
+import time
+import urllib.request
 from pathlib import Path
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 import requests
 
 from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-DB_PATH = Path("data/moderation_queue.db")
-
-def init_db():
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS drafts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        url TEXT UNIQUE,
-        headline TEXT,
-        caption_html TEXT,
-        media_type TEXT,
-        media_url TEXT,
-        photo_base64 TEXT,
-        status TEXT DEFAULT 'pending',
-        admin_message_id INTEGER,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS blacklisted_urls (
-        url TEXT PRIMARY KEY,
-        reason TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
-    conn.commit()
-    conn.close()
-
-# Initialize DB on import
-init_db()
-
+LOCAL_STATE_PATH = Path("data/moderation_state.json")
 
 def call_telegram(method: str, payload: dict[str, Any], files: dict[str, Any] | None = None) -> dict[str, Any]:
     url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/{method}"
@@ -58,51 +28,142 @@ def call_telegram(method: str, payload: dict[str, Any], files: dict[str, Any] | 
         return {"ok": False, "error": str(exc)}
 
 
-class DraftQueueService:
-    def __init__(self):
-        init_db()
+class PersistentDraftQueueService:
+    """
+    100% Persistent Sequential Moderation Queue for Sardarbek (@sardardww).
+    Backs up all drafts and active status to GitHub repository so container
+    restarts / free-tier sleeps NEVER wipe the queue or cause double posts!
+    """
 
-    def get_conn(self) -> sqlite3.Connection:
-        return sqlite3.connect(DB_PATH)
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.state: dict[str, Any] = {
+            "next_id": 1,
+            "active_draft": None,      # The single draft currently displayed to admin
+            "pending_queue": [],       # All queued drafts waiting in line
+            "blacklisted_urls": [
+                "https://t.me/xaliq_ushin/15414"
+            ]
+        }
+        self.load_state()
+
+    def _sync_from_github(self) -> bool:
+        if not settings.GITHUB_PAT:
+            return False
+        url = f"https://api.github.com/repos/{settings.GITHUB_REPO}/contents/data/moderation_state.json"
+        req = urllib.request.Request(
+            url,
+            headers={"Authorization": f"token {settings.GITHUB_PAT}", "User-Agent": "Antigravity"}
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                remote_json = json.loads(base64.b64decode(data["content"]).decode("utf-8"))
+                self.state.update(remote_json)
+                logger.info(f"Loaded persistent state from GitHub: active={bool(self.state.get('active_draft'))}, pending={len(self.state.get('pending_queue', []))}")
+                return True
+        except Exception as exc:
+            logger.warning(f"Could not load state from GitHub: {exc}")
+            return False
+
+    def _sync_to_github_async(self):
+        def _do_push():
+            if not settings.GITHUB_PAT:
+                return
+            url = f"https://api.github.com/repos/{settings.GITHUB_REPO}/contents/data/moderation_state.json"
+            try:
+                # Get current SHA
+                sha = None
+                req = urllib.request.Request(
+                    url,
+                    headers={"Authorization": f"token {settings.GITHUB_PAT}", "User-Agent": "Antigravity"}
+                )
+                try:
+                    with urllib.request.urlopen(req, timeout=10) as resp:
+                        d = json.loads(resp.read().decode("utf-8"))
+                        sha = d.get("sha")
+                except urllib.error.HTTPError as e:
+                    if e.code != 404:
+                        return
+
+                with self.lock:
+                    dumped = json.dumps(self.state, ensure_ascii=False, indent=2)
+
+                body = {
+                    "message": "sync: update moderation queue persistent state",
+                    "content": base64.b64encode(dumped.encode("utf-8")).decode("utf-8")
+                }
+                if sha:
+                    body["sha"] = sha
+
+                req2 = urllib.request.Request(
+                    url,
+                    data=json.dumps(body).encode("utf-8"),
+                    headers={"Authorization": f"token {settings.GITHUB_PAT}", "User-Agent": "Antigravity", "Content-Type": "application/json"},
+                    method="PUT"
+                )
+                urllib.request.urlopen(req2, timeout=15)
+                logger.info("Successfully synced moderation state to GitHub.")
+            except Exception as exc:
+                logger.warning(f"Error syncing state to GitHub: {exc}")
+
+        t = threading.Thread(target=_do_push, daemon=True)
+        t.start()
+
+    def load_state(self):
+        with self.lock:
+            # 1. Try local file first
+            if LOCAL_STATE_PATH.exists():
+                try:
+                    self.state.update(json.loads(LOCAL_STATE_PATH.read_text(encoding="utf-8")))
+                except Exception:
+                    pass
+            # 2. Sync with GitHub for true persistence
+            self._sync_from_github()
+            self._save_local_state_locked()
+
+    def _save_local_state_locked(self):
+        LOCAL_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        LOCAL_STATE_PATH.write_text(json.dumps(self.state, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    def save_state(self):
+        with self.lock:
+            self._save_local_state_locked()
+        self._sync_to_github_async()
 
     def is_url_seen_or_blacklisted(self, url: str) -> bool:
         if not url:
             return False
-        clean_url = url.strip().split("?")[0].rstrip("/")
-        conn = self.get_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT 1 FROM blacklisted_urls WHERE url = ? LIMIT 1", (clean_url,))
-        if cur.fetchone():
-            conn.close()
-            return True
-        cur.execute("SELECT 1 FROM drafts WHERE url = ? LIMIT 1", (clean_url,))
-        res = cur.fetchone() is not None
-        conn.close()
-        return res
+        clean = url.strip().split("?")[0].rstrip("/")
+        with self.lock:
+            if clean in self.state.get("blacklisted_urls", []):
+                return True
+            active = self.state.get("active_draft")
+            if active and active.get("url") == clean:
+                return True
+            for d in self.state.get("pending_queue", []):
+                if d.get("url") == clean:
+                    return True
+        return False
 
     def get_blacklisted_and_seen_urls(self) -> list[str]:
-        conn = self.get_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT url FROM blacklisted_urls UNION SELECT url FROM drafts")
-        rows = [r[0] for r in cur.fetchall()]
-        conn.close()
-        return rows
+        with self.lock:
+            urls = list(self.state.get("blacklisted_urls", []))
+            active = self.state.get("active_draft")
+            if active and active.get("url"):
+                urls.append(active["url"])
+            for d in self.state.get("pending_queue", []):
+                if d.get("url"):
+                    urls.append(d["url"])
+        return list(set(urls))
 
     def has_active_draft_for_admin(self) -> bool:
-        conn = self.get_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT 1 FROM drafts WHERE status = 'active' LIMIT 1")
-        res = cur.fetchone() is not None
-        conn.close()
-        return res
+        with self.lock:
+            return self.state.get("active_draft") is not None
 
     def get_pending_count(self) -> int:
-        conn = self.get_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT COUNT(*) FROM drafts WHERE status = 'pending'")
-        count = cur.fetchone()[0]
-        conn.close()
-        return count
+        with self.lock:
+            return len(self.state.get("pending_queue", []))
 
     def enqueue_draft(
         self,
@@ -117,39 +178,45 @@ class DraftQueueService:
         if self.is_url_seen_or_blacklisted(clean_url):
             return {"status": "skipped", "reason": "URL already enqueued or blacklisted"}
 
-        conn = self.get_conn()
-        cur = conn.cursor()
-        try:
-            cur.execute("""
-            INSERT INTO drafts (url, headline, caption_html, media_type, media_url, photo_base64, status)
-            VALUES (?, ?, ?, ?, ?, ?, 'pending')
-            """, (clean_url, headline, caption_html, media_type, media_url, photo_base64))
-            conn.commit()
-            draft_id = cur.lastrowid
-        except sqlite3.IntegrityError:
-            conn.close()
-            return {"status": "skipped", "reason": "IntegrityError: duplicate URL"}
-        conn.close()
+        with self.lock:
+            draft_id = self.state.get("next_id", 1)
+            self.state["next_id"] = draft_id + 1
 
-        # If no active draft is currently waiting for admin, deliver this draft immediately!
-        if not self.has_active_draft_for_admin():
-            sent = self.send_draft_to_admin(draft_id)
-            return {"status": "delivered_immediately", "draft_id": draft_id, "telegram": sent}
+            new_item = {
+                "id": draft_id,
+                "url": clean_url,
+                "headline": headline,
+                "caption_html": caption_html,
+                "media_type": media_type,
+                "media_url": media_url,
+                "photo_base64": photo_base64,
+                "created_at": time.time()
+            }
 
-        pending = self.get_pending_count()
-        return {"status": "queued", "draft_id": draft_id, "pending_in_queue": pending}
+            has_active = self.state.get("active_draft") is not None
+            if not has_active:
+                # Deliver this draft immediately as active
+                self.state["active_draft"] = new_item
+                self.save_state()
+                sent = self._deliver_draft_to_telegram(new_item)
+                return {"status": "delivered_immediately", "draft_id": draft_id, "telegram": sent}
+            else:
+                # Admin already has an active post in chat! Append to queue strictly!
+                self.state["pending_queue"].append(new_item)
+                self.save_state()
+                pending_count = len(self.state["pending_queue"])
+                logger.info(f"Draft #{draft_id} added to pending queue (Total in queue: {pending_count}). Admin currently has active post.")
+                return {"status": "queued", "draft_id": draft_id, "pending_in_queue": pending_count}
 
-    def send_draft_to_admin(self, draft_id: int) -> bool:
-        conn = self.get_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT id, url, headline, caption_html, media_type, media_url, photo_base64 FROM drafts WHERE id = ?", (draft_id,))
-        row = cur.fetchone()
-        if not row:
-            conn.close()
-            return False
+    def _deliver_draft_to_telegram(self, draft: dict[str, Any]) -> bool:
+        did = draft["id"]
+        dcap = draft["caption_html"]
+        mtype = draft.get("media_type", "photo")
+        murl = draft.get("media_url", "")
+        p_b64 = draft.get("photo_base64")
 
-        did, durl, dhead, dcap, mtype, murl, p_b64 = row
-        pending_after = self.get_pending_count() - 1
+        with self.lock:
+            pending_left = len(self.state.get("pending_queue", []))
 
         markup_rows = [
             [
@@ -157,13 +224,13 @@ class DraftQueueService:
                 {"text": "❌ Biykar etiw", "callback_data": f"del:{did}"}
             ]
         ]
-        if pending_after > 0:
-            markup_rows.append([{"text": f"📋 Náwbette jáne {pending_after} post bar", "callback_data": f"info:{did}"}])
+        if pending_left > 0:
+            markup_rows.append([{"text": f"📋 Náwbette jáne {pending_left} post bar", "callback_data": f"info:{did}"}])
 
         reply_markup = {"inline_keyboard": markup_rows}
         res: dict[str, Any] = {"ok": False}
 
-        # 1. Try sending video if media_type == 'video'
+        # 1. Try sending video
         if mtype == "video" and murl:
             res = call_telegram("sendVideo", {
                 "chat_id": settings.ADMIN_CHAT_ID,
@@ -173,25 +240,24 @@ class DraftQueueService:
                 "reply_markup": json.dumps(reply_markup)
             })
 
-        # 2. Fallback to sending photo
-        if not res.get("ok"):
-            if p_b64:
-                try:
-                    p_bytes = base64.b64decode(p_b64)
-                    res = call_telegram(
-                        "sendPhoto",
-                        {
-                            "chat_id": settings.ADMIN_CHAT_ID,
-                            "caption": dcap,
-                            "parse_mode": "HTML",
-                            "reply_markup": json.dumps(reply_markup)
-                        },
-                        files={"photo": ("news.jpg", p_bytes, "image/jpeg")}
-                    )
-                except Exception as exc:
-                    logger.error(f"Error sending photo_base64: {exc}")
+        # 2. Fallback to sending photo bytes
+        if not res.get("ok") and p_b64:
+            try:
+                p_bytes = base64.b64decode(p_b64)
+                res = call_telegram(
+                    "sendPhoto",
+                    {
+                        "chat_id": settings.ADMIN_CHAT_ID,
+                        "caption": dcap,
+                        "parse_mode": "HTML",
+                        "reply_markup": json.dumps(reply_markup)
+                    },
+                    files={"photo": ("news.jpg", p_bytes, "image/jpeg")}
+                )
+            except Exception as exc:
+                logger.error(f"Error sending photo_base64: {exc}")
 
-        # 3. If still not ok and murl is http
+        # 3. Fallback to sending photo URL
         if not res.get("ok") and murl and murl.startswith("http"):
             res = call_telegram("sendPhoto", {
                 "chat_id": settings.ADMIN_CHAT_ID,
@@ -203,58 +269,60 @@ class DraftQueueService:
 
         if res.get("ok"):
             admin_msg_id = res["result"]["message_id"]
-            cur.execute("UPDATE drafts SET status = 'active', admin_message_id = ? WHERE id = ?", (admin_msg_id, did))
-            conn.commit()
-            conn.close()
+            with self.lock:
+                if self.state.get("active_draft"):
+                    self.state["active_draft"]["admin_message_id"] = admin_msg_id
+            self.save_state()
             logger.info(f"Delivered draft #{did} to Admin msg #{admin_msg_id}")
             return True
 
         logger.error(f"Failed to deliver draft #{did} to admin: {res}")
-        conn.close()
         return False
 
     def send_next_pending_draft(self) -> bool:
-        """Pops the oldest pending draft and delivers it to admin."""
-        conn = self.get_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT id FROM drafts WHERE status = 'pending' ORDER BY id ASC LIMIT 1")
-        row = cur.fetchone()
-        conn.close()
-        if row:
-            return self.send_draft_to_admin(row[0])
-        return False
+        """Pops the next draft in line and delivers it to admin."""
+        next_item = None
+        with self.lock:
+            if self.state.get("pending_queue"):
+                next_item = self.state["pending_queue"].pop(0)
+                self.state["active_draft"] = next_item
+        if next_item:
+            self.save_state()
+            return self._deliver_draft_to_telegram(next_item)
+        else:
+            with self.lock:
+                self.state["active_draft"] = None
+            self.save_state()
+            return False
 
     def mark_published(self, draft_id: int, channel_message_id: int) -> None:
-        conn = self.get_conn()
-        cur = conn.cursor()
-        cur.execute("UPDATE drafts SET status = 'published' WHERE id = ?", (draft_id,))
-        conn.commit()
-        conn.close()
+        with self.lock:
+            active = self.state.get("active_draft")
+            if active and active.get("id") == draft_id:
+                clean = active.get("url")
+                if clean:
+                    self.state.setdefault("blacklisted_urls", []).append(clean)
+                self.state["active_draft"] = None
+        self.save_state()
 
     def mark_rejected(self, draft_id: int, reason: str = "Admin rejected via button") -> None:
-        conn = self.get_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT url FROM drafts WHERE id = ?", (draft_id,))
-        row = cur.fetchone()
-        if row and row[0]:
-            clean_url = row[0].strip().split("?")[0].rstrip("/")
-            cur.execute("INSERT OR REPLACE INTO blacklisted_urls (url, reason) VALUES (?, ?)", (clean_url, reason))
-        cur.execute("UPDATE drafts SET status = 'rejected' WHERE id = ?", (draft_id,))
-        conn.commit()
-        conn.close()
+        with self.lock:
+            active = self.state.get("active_draft")
+            if active and active.get("id") == draft_id:
+                clean = active.get("url")
+                if clean:
+                    self.state.setdefault("blacklisted_urls", []).append(clean)
+                self.state["active_draft"] = None
+        self.save_state()
 
     def update_caption(self, admin_message_id: int, new_caption: str) -> Optional[int]:
-        conn = self.get_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT id FROM drafts WHERE admin_message_id = ? AND status = 'active'", (admin_message_id,))
-        row = cur.fetchone()
-        if row:
-            did = row[0]
-            cur.execute("UPDATE drafts SET caption_html = ? WHERE id = ?", (new_caption, did))
-            conn.commit()
-            conn.close()
-            return did
-        conn.close()
+        with self.lock:
+            active = self.state.get("active_draft")
+            if active and active.get("admin_message_id") == admin_message_id:
+                active["caption_html"] = new_caption
+                did = active.get("id")
+                self.save_state()
+                return did
         return None
 
-draft_service = DraftQueueService()
+draft_service = PersistentDraftQueueService()
