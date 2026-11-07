@@ -67,6 +67,7 @@ class PersistentDraftQueueService:
             return False
 
     def _sync_to_github_async(self):
+        return  # Disabled to prevent continuous Render redeploy loop
         def _do_push():
             if not settings.GITHUB_PAT:
                 return
