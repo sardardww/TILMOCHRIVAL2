@@ -36,7 +36,7 @@ class PersistentDraftQueueService:
     """
 
     def __init__(self):
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
         self.state: dict[str, Any] = {
             "next_id": 1,
             "active_draft": None,      # The single draft currently displayed to admin
