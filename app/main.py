@@ -282,12 +282,6 @@ async def telegram_webhook(request: Request):
 
                 # IMMEDIATELY DELIVER NEXT DRAFT IN QUEUE!
                 popped = draft_service.send_next_pending_draft()
-                if not popped and pending_left == 0:
-                    call_telegram("sendMessage", {
-                        "chat_id": chat_id,
-                        "text": "🎉 <b>Barlıq postlar tekserildi!</b>\nNáwbet bos. Jańa postlar hár 15 minutda tayarlanıp baradı.",
-                        "parse_mode": "HTML"
-                    })
 
             else:
                 call_telegram("answerCallbackQuery", {
@@ -317,12 +311,6 @@ async def telegram_webhook(request: Request):
 
             # IMMEDIATELY DELIVER NEXT DRAFT IN QUEUE!
             popped = draft_service.send_next_pending_draft()
-            if not popped and pending_left == 0:
-                call_telegram("sendMessage", {
-                    "chat_id": chat_id,
-                    "text": "🎉 <b>Barlıq postlar tekserildi!</b>\nNáwbet bos. Jańa postlar hár 15 minutda tayarlanıp baradı.",
-                    "parse_mode": "HTML"
-                })
 
         return JSONResponse({"status": "ok"})
 
