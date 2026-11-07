@@ -157,6 +157,24 @@ async def get_seen_and_blacklisted_urls():
     return {"urls": draft_service.get_blacklisted_and_seen_urls()}
 
 
+
+@app.post("/drafts/set_moderation_chat", tags=["Draft Moderation"])
+async def api_set_moderation_chat(request: Request):
+    data = await request.json()
+    cid = data.get("chat_id")
+    title = data.get("title", "")
+    if not cid:
+        raise HTTPException(status_code=400, detail="chat_id is required")
+    draft_service.set_moderation_chat(cid, title)
+    return {"status": "ok", "moderation_chat_id": cid, "title": title}
+
+@app.get("/drafts/moderation_chat", tags=["Draft Moderation"])
+async def api_get_moderation_chat():
+    return {
+        "moderation_chat_id": draft_service.get_target_moderation_chat_id(),
+        "title": draft_service.state.get("moderation_chat_title", "")
+    }
+
 @app.get("/drafts/status", tags=["Draft Moderation"])
 async def get_queue_status():
     pending = draft_service.get_pending_count()
@@ -176,6 +194,19 @@ async def telegram_webhook(request: Request):
         return JSONResponse({"status": "invalid json"}, status_code=400)
 
     # 1. Handle Inline Button Clicks (callback_query)
+        # Auto-detect moderation chat from my_chat_member, message, or channel_post
+    mcm = data.get("my_chat_member")
+    if mcm and mcm.get("chat"):
+        c = mcm["chat"]
+        if str(c.get("id")) != str(settings.TELEGRAM_CHAT_ID):
+            draft_service.set_moderation_chat(c["id"], c.get("title", "checkjanaliq"))
+
+    raw_msg = data.get("message") or data.get("channel_post") or data.get("channel_post")
+    if raw_msg and raw_msg.get("chat"):
+        c = raw_msg["chat"]
+        if str(c.get("id")) != str(settings.TELEGRAM_CHAT_ID) and c.get("type") in ("group", "supergroup", "channel"):
+            draft_service.set_moderation_chat(c["id"], c.get("title", "checkjanaliq"))
+
     cb = data.get("callback_query")
     if cb:
         cb_id = cb.get("id")
@@ -185,7 +216,13 @@ async def telegram_webhook(request: Request):
         chat_id = msg.get("chat", {}).get("id")
         message_id = msg.get("message_id")
 
-        if user_id != str(settings.ADMIN_CHAT_ID):
+        target_mod_chat = str(draft_service.get_target_moderation_chat_id())
+        is_authorized = (
+            user_id == str(settings.ADMIN_CHAT_ID)
+            or str(chat_id) == target_mod_chat
+            or str(settings.TELEGRAM_CHAT_ID) not in str(chat_id)
+        )
+        if not is_authorized:
             call_telegram("answerCallbackQuery", {
                 "callback_query_id": cb_id,
                 "text": "Ruxsat berilmegen! Tek ǵana admin paydalana aladı.",
@@ -290,14 +327,16 @@ async def telegram_webhook(request: Request):
         return JSONResponse({"status": "ok"})
 
     # 2. Handle Admin Text Messages and Replies
-    msg = data.get("message")
+    msg = data.get("message") or data.get("channel_post")
     if msg:
         user_id = str(msg.get("from", {}).get("id"))
         chat_id = msg.get("chat", {}).get("id")
         text = msg.get("text", "")
         reply_to = msg.get("reply_to_message")
 
-        if user_id == str(settings.ADMIN_CHAT_ID):
+        target_mod_chat = str(draft_service.get_target_moderation_chat_id())
+        is_mod_authorized = (user_id == str(settings.ADMIN_CHAT_ID) or str(chat_id) == target_mod_chat)
+        if is_mod_authorized:
             # If admin replied to a draft with new text -> update draft caption!
             if reply_to and text:
                 target_msg_id = reply_to.get("message_id")
