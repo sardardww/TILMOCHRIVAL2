@@ -19,9 +19,9 @@ def call_telegram(method: str, payload: dict[str, Any], files: dict[str, Any] | 
     url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/{method}"
     try:
         if files:
-            r = requests.post(url, data=payload, files=files, timeout=40)
+            r = requests.post(url, data=payload, files=files, timeout=15)
         else:
-            r = requests.post(url, json=payload, timeout=25)
+            r = requests.post(url, json=payload, timeout=15)
         return r.json()
     except Exception as exc:
         logger.error(f"Telegram API {method} error: {exc}")
@@ -198,8 +198,8 @@ class PersistentDraftQueueService:
                 # Deliver this draft immediately as active
                 self.state["active_draft"] = new_item
                 self.save_state()
-                sent = self._deliver_draft_to_telegram(new_item)
-                return {"status": "delivered_immediately", "draft_id": draft_id, "telegram": sent}
+                threading.Thread(target=self._deliver_draft_to_telegram, args=(new_item,), daemon=True).start()
+                return {"status": "delivered_immediately", "draft_id": draft_id}
             else:
                 # Admin already has an active post in chat! Append to queue strictly!
                 self.state["pending_queue"].append(new_item)
@@ -288,7 +288,8 @@ class PersistentDraftQueueService:
                 self.state["active_draft"] = next_item
         if next_item:
             self.save_state()
-            return self._deliver_draft_to_telegram(next_item)
+            threading.Thread(target=self._deliver_draft_to_telegram, args=(next_item,), daemon=True).start()
+            return True
         else:
             with self.lock:
                 self.state["active_draft"] = None
