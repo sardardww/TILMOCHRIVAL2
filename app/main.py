@@ -13,7 +13,8 @@ from pydantic import BaseModel
 
 from app.config import settings
 from app.dictionary_service import dictionary_service
-from app.draft_service import draft_service, call_telegram
+from app.draft_service import draft_service
+from app.grammar_service import apply_grammar_corrections, call_telegram
 from app.schemas import (
     BatchTranslationRequest,
     BatchTranslationResponse,
@@ -300,7 +301,53 @@ async def telegram_webhook(request: Request):
             # If admin replied to a draft with new text -> update draft caption!
             if reply_to and text:
                 target_msg_id = reply_to.get("message_id")
-                updated_draft_id = draft_service.update_caption(target_msg_id, text)
+                stripped_cmd = text.strip().lower()
+
+                # Quick reply command: Approve & publish immediately
+                if stripped_cmd in ("ok", "pub", "tasdiqla", "ha", "shıǵar", "shigar", "🚀"):
+                    res = call_telegram("copyMessage", {
+                        "chat_id": settings.TELEGRAM_CHAT_ID,
+                        "from_chat_id": chat_id,
+                        "message_id": target_msg_id
+                    })
+                    if res.get("ok"):
+                        pub_msg_id = res["result"]["message_id"]
+                        pub_url = f"https://t.me/qaraqalpaqshajanaliqlar/{pub_msg_id}"
+                        call_telegram("editMessageReplyMarkup", {
+                            "chat_id": chat_id,
+                            "message_id": target_msg_id,
+                            "reply_markup": {"inline_keyboard": [[{"text": f"✅ Kanalǵa shıǵarıldı (#{pub_msg_id})", "url": pub_url}]]}
+                        })
+                        call_telegram("sendMessage", {
+                            "chat_id": chat_id,
+                            "text": f"🚀 <b>Post avtomat túrde kanalǵa shıǵarıldı!</b> (#{pub_msg_id})\n🔗 <a href='{pub_url}'>Kanalda kóriw</a>",
+                            "parse_mode": "HTML",
+                            "reply_to_message_id": msg.get("message_id")
+                        })
+                        if draft_service.get_pending_count() > 0:
+                            draft_service.send_next_draft(chat_id)
+                    return JSONResponse({"status": "ok"})
+
+                # Quick reply command: Cancel & delete
+                if stripped_cmd in ("del", "biykar", "bekor", "yoq", "joq", "otmen", "❌"):
+                    call_telegram("editMessageReplyMarkup", {
+                        "chat_id": chat_id,
+                        "message_id": target_msg_id,
+                        "reply_markup": {"inline_keyboard": [[{"text": "❌ Biykar etildi", "callback_data": "none"}]]}
+                    })
+                    call_telegram("sendMessage", {
+                        "chat_id": chat_id,
+                        "text": "❌ <b>Post biykar etildi.</b>",
+                        "parse_mode": "HTML",
+                        "reply_to_message_id": msg.get("message_id")
+                    })
+                    if draft_service.get_pending_count() > 0:
+                        draft_service.send_next_draft(chat_id)
+                    return JSONResponse({"status": "ok"})
+
+                # Admin provided edited text: Clean with strict 2016 grammar rules
+                cleaned_text = apply_grammar_corrections(text)
+                updated_draft_id = draft_service.update_caption(target_msg_id, cleaned_text)
 
                 reply_markup = reply_to.get("reply_markup") or {
                     "inline_keyboard": [
@@ -313,7 +360,7 @@ async def telegram_webhook(request: Request):
                 edit_res = call_telegram("editMessageCaption", {
                     "chat_id": chat_id,
                     "message_id": target_msg_id,
-                    "caption": text,
+                    "caption": cleaned_text,
                     "parse_mode": "HTML",
                     "reply_markup": reply_markup
                 })
@@ -321,7 +368,7 @@ async def telegram_webhook(request: Request):
                     edit_res = call_telegram("editMessageCaption", {
                         "chat_id": chat_id,
                         "message_id": target_msg_id,
-                        "caption": text,
+                        "caption": cleaned_text,
                         "reply_markup": reply_markup
                     })
 
