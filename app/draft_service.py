@@ -213,7 +213,7 @@ class PersistentDraftQueueService:
             mod_chat = self.state.get("moderation_chat_id")
             if mod_chat:
                 return str(mod_chat)
-        return str(settings.ADMIN_CHAT_ID)
+        return str(getattr(settings, "MODERATION_CHAT_ID", "-1003941073968"))
 
     def set_moderation_chat(self, chat_id: Any, title: str = ""):
         with self.lock:
