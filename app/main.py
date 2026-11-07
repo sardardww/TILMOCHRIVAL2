@@ -233,8 +233,7 @@ async def telegram_webhook(request: Request):
                         ]
                     }
                 })
-                if draft_id:
-                    draft_service.mark_published(draft_id, pub_msg_id)
+                draft_service.mark_published(draft_id, pub_msg_id)
 
                 pending_left = draft_service.get_pending_count()
                 call_telegram("answerCallbackQuery", {
@@ -269,8 +268,7 @@ async def telegram_webhook(request: Request):
                     ]
                 }
             })
-            if draft_id:
-                draft_service.mark_rejected(draft_id)
+            draft_service.mark_rejected(draft_id)
 
             pending_left = draft_service.get_pending_count()
             call_telegram("answerCallbackQuery", {
