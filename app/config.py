@@ -27,6 +27,7 @@ class Settings:
     TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "9218407703:AAFSOcaVFSJafUL4liO-TS982y58ODYY2BA").strip()
     TELEGRAM_CHAT_ID: str = os.getenv("TELEGRAM_CHAT_ID", "-1003987848482").strip()
     ADMIN_CHAT_ID: str = os.getenv("ADMIN_CHAT_ID", "5649102659").strip()
+    MODERATION_CHAT_ID: str = os.getenv("MODERATION_CHAT_ID", "-1003941073968").strip()
 
     # Persistent GitHub State Storage (Survives Render container restarts 100%)
     GITHUB_PAT: str = (
