@@ -208,7 +208,7 @@ class PersistentDraftQueueService:
                 logger.info(f"Draft #{draft_id} added to pending queue (Total in queue: {pending_count}). Admin currently has active post.")
                 return {"status": "queued", "draft_id": draft_id, "pending_in_queue": pending_count}
 
-        def get_target_moderation_chat_id(self) -> str:
+    def get_target_moderation_chat_id(self) -> str:
         with self.lock:
             mod_chat = self.state.get("moderation_chat_id")
             if mod_chat:
@@ -223,7 +223,7 @@ class PersistentDraftQueueService:
         self.save_state()
         logger.info(f"Target moderation chat set to: {chat_id} ({title})")
 
-def _deliver_draft_to_telegram(self, draft: dict[str, Any]) -> bool:
+    def _deliver_draft_to_telegram(self, draft: dict[str, Any]) -> bool:
         did = draft["id"]
         dcap = draft["caption_html"]
         mtype = draft.get("media_type", "photo")
