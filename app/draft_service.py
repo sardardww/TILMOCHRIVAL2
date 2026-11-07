@@ -246,15 +246,35 @@ class PersistentDraftQueueService:
         reply_markup = {"inline_keyboard": markup_rows}
         res: dict[str, Any] = {"ok": False}
 
-        # 1. Try sending video
+        # 1. Try sending video (download bytes first for 100% reliable upload)
         if mtype == "video" and murl:
-            res = call_telegram("sendVideo", {
-                "chat_id": self.get_target_moderation_chat_id(),
-                "video": murl,
-                "caption": dcap,
-                "parse_mode": "HTML",
-                "reply_markup": json.dumps(reply_markup)
-            })
+            try:
+                logger.info(f"Downloading video from {murl[:60]} for direct Telegram upload...")
+                vr = requests.get(murl, headers={"User-Agent": "Mozilla/5.0"}, stream=True, timeout=30)
+                if vr.status_code == 200:
+                    v_bytes = vr.content
+                    if 5000 < len(v_bytes) <= 50 * 1024 * 1024:
+                        res = call_telegram(
+                            "sendVideo",
+                            {
+                                "chat_id": self.get_target_moderation_chat_id(),
+                                "caption": dcap,
+                                "parse_mode": "HTML",
+                                "supports_streaming": "true",
+                                "reply_markup": json.dumps(reply_markup)
+                            },
+                            files={"video": ("news_video.mp4", v_bytes, "video/mp4")}
+                        )
+            except Exception as vexc:
+                logger.error(f"Error downloading/uploading video on Render: {vexc}")
+            if not res.get("ok"):
+                res = call_telegram("sendVideo", {
+                    "chat_id": self.get_target_moderation_chat_id(),
+                    "video": murl,
+                    "caption": dcap,
+                    "parse_mode": "HTML",
+                    "reply_markup": json.dumps(reply_markup)
+                })
 
         # 2. Fallback to sending photo bytes
         if not res.get("ok") and p_b64:
