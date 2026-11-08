@@ -252,22 +252,30 @@ async def telegram_webhook(request: Request):
             return JSONResponse({"status": "ok"})
 
         if cb_action.startswith("pub"):
-            # Copy cleanly to public channel (-1003987848482)
+            # 1. Copy cleanly to primary private channel (-1003987848482)
             res = call_telegram("copyMessage", {
                 "chat_id": settings.TELEGRAM_CHAT_ID,
                 "from_chat_id": chat_id,
                 "message_id": message_id
             })
 
-            if res.get("ok"):
-                pub_msg_id = res["result"]["message_id"]
-                pub_url = f"https://t.me/qaraqalpaqshajanaliqlar/{pub_msg_id}"
+            # 2. ALSO copy cleanly to secondary public channel (@janaliqjanaliq)
+            res_sec = call_telegram("copyMessage", {
+                "chat_id": "@janaliqjanaliq",
+                "from_chat_id": chat_id,
+                "message_id": message_id
+            })
+
+            if res.get("ok") or (res_sec and res_sec.get("ok")):
+                pub_msg_id = res.get("result", {}).get("message_id") if res.get("ok") else 0
+                sec_msg_id = res_sec.get("result", {}).get("message_id") if (res_sec and res_sec.get("ok")) else 0
+                pub_url = f"https://t.me/janaliqjanaliq/{sec_msg_id}" if sec_msg_id else f"https://t.me/c/3987848482/{pub_msg_id}"
                 call_telegram("editMessageReplyMarkup", {
                     "chat_id": chat_id,
                     "message_id": message_id,
                     "reply_markup": {
                         "inline_keyboard": [
-                            [{"text": f"✅ Kanalǵa shıǵarıldı (#{pub_msg_id})", "url": pub_url}]
+                            [{"text": f"✅ Kanalǵa shıǵarıldı (@janaliqjanaliq #{sec_msg_id or pub_msg_id})", "url": pub_url}]
                         ]
                     }
                 })
