@@ -56,7 +56,7 @@ def _auto_poster_trigger_loop():
     while True:
         try:
             gh_token = (
-                settings.GITHUB_PAT
+                os.getenv("QRJANALIQ_POSTER_PAT")
                 or ('github_pat_' + '11CTREF4A0VDflLOqap0lR_' + '11rC8qt7lsTBlPSnF8LRm6vyrpLL7TNJo6ks0OmOp62AJVCW6FTloqLa9XA')
             )
             headers = {
