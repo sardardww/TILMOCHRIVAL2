@@ -1,3 +1,5 @@
+import threading
+import time
 import base64
 import json
 import logging
@@ -31,6 +33,20 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 logger = logging.getLogger("api")
+
+
+# 24/7 Keep-Alive Background Thread (Prevents Render Free Tier from ever sleeping)
+def _render_keep_alive_loop():
+    import time
+    logger.info("Starting Render 24/7 self-keepalive background thread...")
+    while True:
+        try:
+            time.sleep(240) # Every 4 minutes
+            requests.get("https://karakalpak-translator-api.onrender.com/health", timeout=10)
+        except Exception as exc:
+            logger.warning(f"Keepalive ping notice: {exc}")
+
+threading.Thread(target=_render_keep_alive_loop, daemon=True).start()
 
 app = FastAPI(
     title=settings.APP_NAME,
