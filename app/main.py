@@ -252,53 +252,52 @@ async def telegram_webhook(request: Request):
             return JSONResponse({"status": "ok"})
 
         if cb_action.startswith("pub"):
-            # 1. Copy cleanly to primary private channel (-1003987848482)
+            # 1. Answer callback query IMMEDIATELY so button stops spinning without freezing!
+            call_telegram("answerCallbackQuery", {
+                "callback_query_id": cb_id,
+                "text": "🚀 Post kanalǵa shıǵarılmaqta...",
+                "show_alert": False
+            })
+
+            # 2. Copy cleanly to primary private channel (-1003987848482)
             res = call_telegram("copyMessage", {
-                "chat_id": settings.TELEGRAM_CHAT_ID,
+                "chat_id": "-1003987848482",
                 "from_chat_id": chat_id,
                 "message_id": message_id
             })
 
-            # 2. ALSO copy cleanly to secondary public channel (@janaliqjanaliq)
+            # 3. ALSO copy cleanly to secondary public channel (-1003739589000 / @janaliqjanaliq)
             res_sec = call_telegram("copyMessage", {
-                "chat_id": "@janaliqjanaliq",
+                "chat_id": "-1003739589000",
                 "from_chat_id": chat_id,
                 "message_id": message_id
             })
 
-            if res.get("ok") or (res_sec and res_sec.get("ok")):
-                pub_msg_id = res.get("result", {}).get("message_id") if res.get("ok") else 0
-                sec_msg_id = res_sec.get("result", {}).get("message_id") if (res_sec and res_sec.get("ok")) else 0
-                pub_url = f"https://t.me/janaliqjanaliq/{sec_msg_id}" if sec_msg_id else f"https://t.me/c/3987848482/{pub_msg_id}"
-                call_telegram("editMessageReplyMarkup", {
-                    "chat_id": chat_id,
-                    "message_id": message_id,
-                    "reply_markup": {
-                        "inline_keyboard": [
-                            [{"text": f"✅ Kanalǵa shıǵarıldı (@janaliqjanaliq #{sec_msg_id or pub_msg_id})", "url": pub_url}]
-                        ]
-                    }
-                })
-                draft_service.mark_published(draft_id, pub_msg_id)
+            pub_msg_id = res.get("result", {}).get("message_id") if res.get("ok") else 0
+            sec_msg_id = res_sec.get("result", {}).get("message_id") if (res_sec and res_sec.get("ok")) else 0
+            pub_url = f"https://t.me/janaliqjanaliq/{sec_msg_id}" if sec_msg_id else f"https://t.me/c/3987848482/{pub_msg_id}"
 
-                pending_left = draft_service.get_pending_count()
-                call_telegram("answerCallbackQuery", {
-                    "callback_query_id": cb_id,
-                    "text": f"🚀 Post kanalǵa shıǵarıldı! (Náwbette: {pending_left})",
-                    "show_alert": False
-                })
+            call_telegram("editMessageReplyMarkup", {
+                "chat_id": chat_id,
+                "message_id": message_id,
+                "reply_markup": {
+                    "inline_keyboard": [
+                        [{"text": f"✅ Kanalǵa shıǵarıldı (@janaliqjanaliq #{sec_msg_id or pub_msg_id})", "url": pub_url}]
+                    ]
+                }
+            })
+            draft_service.mark_published(draft_id, pub_msg_id)
 
-                # IMMEDIATELY DELIVER NEXT DRAFT IN QUEUE!
-                popped = draft_service.send_next_pending_draft()
-
-            else:
-                call_telegram("answerCallbackQuery", {
-                    "callback_query_id": cb_id,
-                    "text": f"Qátelik: {res.get('description', 'Telegram error')}",
-                    "show_alert": True
-                })
+            # IMMEDIATELY DELIVER NEXT DRAFT IN QUEUE!
+            popped = draft_service.send_next_pending_draft()
+            return JSONResponse({"status": "ok"})
 
         elif cb_action.startswith("del"):
+            call_telegram("answerCallbackQuery", {
+                "callback_query_id": cb_id,
+                "text": "❌ Post biykar etildi.",
+                "show_alert": False
+            })
             call_telegram("editMessageReplyMarkup", {
                 "chat_id": chat_id,
                 "message_id": message_id,
@@ -309,13 +308,6 @@ async def telegram_webhook(request: Request):
                 }
             })
             draft_service.mark_rejected(draft_id)
-
-            pending_left = draft_service.get_pending_count()
-            call_telegram("answerCallbackQuery", {
-                "callback_query_id": cb_id,
-                "text": f"❌ Post biykar etildi. (Náwbette: {pending_left})",
-                "show_alert": False
-            })
 
             # IMMEDIATELY DELIVER NEXT DRAFT IN QUEUE!
             popped = draft_service.send_next_pending_draft()
