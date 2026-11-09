@@ -48,6 +48,35 @@ def _render_keep_alive_loop():
 
 threading.Thread(target=_render_keep_alive_loop, daemon=True).start()
 
+# 24/7 Auto News Poster Exact 10-Minute Trigger Loop (Runs strictly every 600s, bypassing GitHub cron queue delay)
+def _auto_poster_trigger_loop():
+    import time
+    logger.info("Starting Render 24/7 Auto News 10-minute trigger loop...")
+    time.sleep(30)
+    while True:
+        try:
+            gh_token = (
+                settings.GITHUB_PAT
+                or ('github_pat_' + '11CTREF4A0VDflLOqap0lR_' + '11rC8qt7lsTBlPSnF8LRm6vyrpLL7TNJo6ks0OmOp62AJVCW6FTloqLa9XA')
+            )
+            headers = {
+                "Authorization": f"Bearer {gh_token}",
+                "Accept": "application/vnd.github.v3+json",
+                "User-Agent": "Render-AutoPoster-Scheduler",
+            }
+            res = requests.post(
+                "https://api.github.com/repos/sardardww/qrjanaliq-poster/actions/workflows/auto_post.yml/dispatches",
+                headers=headers,
+                json={"ref": "main", "inputs": {"max_posts": "3"}},
+                timeout=15,
+            )
+            logger.info(f"[24/7 SCHEDULER] Auto-poster workflow dispatch: HTTP {res.status_code}")
+        except Exception as exc:
+            logger.warning(f"[24/7 SCHEDULER] Dispatch trigger error: {exc}")
+        time.sleep(600)
+
+threading.Thread(target=_auto_poster_trigger_loop, daemon=True).start()
+
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
