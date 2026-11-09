@@ -15,8 +15,8 @@ from pydantic import BaseModel
 
 from app.config import settings
 from app.dictionary_service import dictionary_service
-from app.draft_service import draft_service
-from app.grammar_service import apply_grammar_corrections, call_telegram
+from app.draft_service import draft_service, call_telegram
+from app.grammar_service import apply_grammar_corrections
 from app.schemas import (
     BatchTranslationRequest,
     BatchTranslationResponse,
