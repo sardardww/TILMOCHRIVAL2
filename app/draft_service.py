@@ -91,7 +91,7 @@ class PersistentDraftQueueService:
                     dumped = json.dumps(self.state, ensure_ascii=False, indent=2)
 
                 body = {
-                    "message": "sync: update moderation queue persistent state",
+                    "message": "sync: update moderation queue persistent state [skip render]",
                     "content": base64.b64encode(dumped.encode("utf-8")).decode("utf-8")
                 }
                 if sha:
