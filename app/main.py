@@ -75,7 +75,7 @@ def _auto_poster_trigger_loop():
             logger.warning(f"[24/7 SCHEDULER] Dispatch trigger error: {exc}")
         time.sleep(600)
 
-# Disabled duplicate scheduler thread (GitHub Actions cron already runs auto_post.yml)
+threading.Thread(target=_auto_poster_trigger_loop, daemon=True).start()
 
 app = FastAPI(
     title=settings.APP_NAME,

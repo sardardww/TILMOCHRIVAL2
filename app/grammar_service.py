@@ -345,3 +345,5 @@ def fix_common_grammatical_slips(text: str) -> str:
 
 # Export alias for backward compatibility
 KARAKALPAK_ACADEMIC_GRAMMAR_PROMPT = load_academic_grammar_text()
+
+apply_grammar_corrections = fix_common_grammatical_slips
