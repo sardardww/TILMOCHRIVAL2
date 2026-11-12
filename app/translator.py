@@ -110,22 +110,22 @@ KARAKALPAK_SYSTEM_PROMPT = get_karakalpak_system_prompt()
 
 # Multi-tier Model Priority Cascade (Ranked from Best/Fastest to Most Reliable Backup)
 RANKED_MODEL_CASCADE = [
-    "gemini-3.8-flash",       # Rank 1: Top-tier flagship model (Best translation quality)
-    "gemini-3.6-flash",       # Rank 2: High intelligence flagship
-    "gemini-3.5-flash",       # Rank 3: High reasoning flash
-    "gemini-3.5-flash-lite",  # Rank 4: Ultra-fast sub-2s latency
-    "gemini-3.1-flash-lite",  # Rank 5: Lightweight backup
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-3.5-flash-lite",
+    "gemini-3.8-flash",
 ]
 
 MODEL_ALIASES = {
-    "auto": "gemini-3.8-flash",
-    "default": "gemini-3.8-flash",
-    "gemini-flash-latest": "gemini-3.8-flash",
-    "gemini-2.5-flash": "gemini-3.8-flash",
-    "gemini-2.5-flash-lite": "gemini-3.5-flash-lite",
-    "gemini-2.0-flash": "gemini-3.5-flash",
-    "gemini-2.0-flash-lite": "gemini-3.5-flash-lite",
-    "gemini-1.5-flash": "gemini-3.1-flash-lite",
+    "auto": "gemini-2.5-flash",
+    "default": "gemini-2.5-flash",
+    "gemini-flash-latest": "gemini-2.5-flash",
+    "gemini-2.5-flash": "gemini-2.5-flash",
+    "gemini-2.5-flash-lite": "gemini-2.5-flash-lite",
+    "gemini-2.0-flash": "gemini-2.0-flash",
+    "gemini-2.0-flash-lite": "gemini-2.0-flash-lite",
+    "gemini-1.5-flash": "gemini-2.0-flash-lite",
 }
 
 class KarakalpakTranslator:
@@ -136,7 +136,7 @@ class KarakalpakTranslator:
         key = (api_key or settings.GEMINI_API_KEY).strip()
         if not key:
             return None
-        return genai.Client(api_key=key)
+        return genai.Client(api_key=key, http_options=types.HttpOptions(timeout=12000))
 
     async def translate(
         self,
@@ -153,7 +153,7 @@ class KarakalpakTranslator:
         client = self._get_client(custom_api_key)
         
         # 1. Extract grounding dictionary entries
-        matches = dictionary_service.extract_matches_for_text(text)
+        matches = await asyncio.to_thread(dictionary_service.extract_matches_for_text, text)
         glossary_text = dictionary_service.format_glossary_for_prompt(matches)
 
         # 2. Check if Gemini API Key is available
@@ -194,7 +194,7 @@ Return the result strictly as JSON:
                         model=target_model,
                         contents=user_prompt,
                         config=types.GenerateContentConfig(
-                            system_instruction=get_karakalpak_system_prompt(),
+                            system_instruction=KARAKALPAK_SYSTEM_PROMPT,
                             temperature=0.1,
                             response_mime_type="application/json",
                         ),
@@ -203,7 +203,7 @@ Return the result strictly as JSON:
                 # Generous 14.0s timeout per model so complex long paragraphs complete successfully
                 response = await asyncio.wait_for(
                     asyncio.to_thread(_call_model),
-                    timeout=30.0
+                    timeout=14.0
                 )
                 
                 raw_text = response.text.strip()

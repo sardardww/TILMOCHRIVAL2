@@ -45,7 +45,7 @@ class PersistentDraftQueueService:
                 "https://t.me/xaliq_ushin/15414"
             ]
         }
-        self.load_state()
+        threading.Thread(target=self.load_state, daemon=True).start()
 
     def _sync_from_github(self) -> bool:
         if not settings.GITHUB_PAT:
@@ -210,11 +210,7 @@ class PersistentDraftQueueService:
                 return {"status": "queued", "draft_id": draft_id, "pending_in_queue": pending_count}
 
     def get_target_moderation_chat_id(self) -> str:
-        with self.lock:
-            mod_chat = self.state.get("moderation_chat_id")
-            if mod_chat:
-                return str(mod_chat)
-        return str(getattr(settings, "MODERATION_CHAT_ID", "-1003941073968"))
+        return "-1003941073968"
 
     def set_moderation_chat(self, chat_id: Any, title: str = ""):
         with self.lock:

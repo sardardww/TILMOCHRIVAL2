@@ -1,4 +1,5 @@
 import difflib
+import threading
 import json
 import logging
 import re
@@ -39,7 +40,7 @@ class KarakalpakDictionaryService:
         self.stem_index: Dict[str, List[str]] = {}
         self.phrase_keys: List[str] = []
         self._is_loaded = False
-        self.load()
+        threading.Thread(target=self.load, daemon=True).start()
 
     def load(self):
         """Loads and pre-indexes the 16,000+ Russian-Karakalpak dictionary entries."""

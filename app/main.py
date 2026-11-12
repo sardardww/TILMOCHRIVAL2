@@ -75,7 +75,7 @@ def _auto_poster_trigger_loop():
             logger.warning(f"[24/7 SCHEDULER] Dispatch trigger error: {exc}")
         time.sleep(600)
 
-threading.Thread(target=_auto_poster_trigger_loop, daemon=True).start()
+# Disabled duplicate scheduler thread (GitHub Actions cron already runs auto_post.yml)
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -238,19 +238,11 @@ async def telegram_webhook(request: Request):
     except Exception:
         return JSONResponse({"status": "invalid json"}, status_code=400)
 
-    # 1. Handle Inline Button Clicks (callback_query)
-        # Auto-detect moderation chat from my_chat_member, message, or channel_post
-    mcm = data.get("my_chat_member")
-    if mcm and mcm.get("chat"):
-        c = mcm["chat"]
-        if str(c.get("id")) != str(settings.TELEGRAM_CHAT_ID):
-            draft_service.set_moderation_chat(c["id"], c.get("title", "checkjanaliq"))
+    threading.Thread(target=_process_telegram_webhook_bg, args=(data,), daemon=True).start()
+    return JSONResponse({"status": "ok"})
 
-    raw_msg = data.get("message") or data.get("channel_post") or data.get("channel_post")
-    if raw_msg and raw_msg.get("chat"):
-        c = raw_msg["chat"]
-        if str(c.get("id")) != str(settings.TELEGRAM_CHAT_ID) and c.get("type") in ("group", "supergroup", "channel"):
-            draft_service.set_moderation_chat(c["id"], c.get("title", "checkjanaliq"))
+
+def _process_telegram_webhook_bg(data: dict[str, Any]):
 
     cb = data.get("callback_query")
     if cb:
