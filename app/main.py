@@ -75,7 +75,7 @@ def _auto_poster_trigger_loop():
             logger.warning(f"[24/7 SCHEDULER] Dispatch trigger error: {exc}")
         time.sleep(600)
 
-threading.Thread(target=_auto_poster_trigger_loop, daemon=True).start()
+# Disabled duplicate scheduler thread (GitHub Actions cron already runs auto_post.yml)
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -296,30 +296,22 @@ def _process_telegram_webhook_bg(data: dict[str, Any]):
                 "show_alert": False
             })
 
-            # 2. Copy cleanly to primary private channel (-1003987848482)
+            # 2. Copy cleanly to @qaraqalpaqshajanaliqlar (-1003987848482)
             res = call_telegram("copyMessage", {
                 "chat_id": "-1003987848482",
                 "from_chat_id": chat_id,
                 "message_id": message_id
             })
 
-            # 3. ALSO copy cleanly to secondary public channel (-1003739589000 / @janaliqjanaliq)
-            res_sec = call_telegram("copyMessage", {
-                "chat_id": "-1003739589000",
-                "from_chat_id": chat_id,
-                "message_id": message_id
-            })
-
             pub_msg_id = res.get("result", {}).get("message_id") if res.get("ok") else 0
-            sec_msg_id = res_sec.get("result", {}).get("message_id") if (res_sec and res_sec.get("ok")) else 0
-            pub_url = f"https://t.me/janaliqjanaliq/{sec_msg_id}" if sec_msg_id else f"https://t.me/qaraqalpaqshajanaliqlar/{pub_msg_id}"
+            pub_url = f"https://t.me/qaraqalpaqshajanaliqlar/{pub_msg_id}"
 
             call_telegram("editMessageReplyMarkup", {
                 "chat_id": chat_id,
                 "message_id": message_id,
                 "reply_markup": {
                     "inline_keyboard": [
-                        [{"text": f"✅ Kanalǵa shıǵarıldı (@qaraqalpaqshajanaliqlar #{pub_msg_id or sec_msg_id})", "url": pub_url}]
+                        [{"text": f"✅ Kanalǵa shıǵarıldı (@qaraqalpaqshajanaliqlar #{pub_msg_id})", "url": pub_url}]
                     ]
                 }
             })
