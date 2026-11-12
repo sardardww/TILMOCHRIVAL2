@@ -110,22 +110,22 @@ KARAKALPAK_SYSTEM_PROMPT = get_karakalpak_system_prompt()
 
 # Multi-tier Model Priority Cascade (Ranked from Best/Fastest to Most Reliable Backup)
 RANKED_MODEL_CASCADE = [
-    "gemini-2.5-flash",
-    "gemini-2.0-flash",
-    "gemini-2.5-flash-lite",
-    "gemini-3.5-flash-lite",
-    "gemini-3.8-flash",
+    "gemini-3.5-flash",       # Rank 1: High reasoning flash with high all-day quota
+    "gemini-3.5-flash-lite",  # Rank 2: Ultra-fast sub-2s latency
+    "gemini-3.6-flash",       # Rank 3: High intelligence flagship
+    "gemini-3.1-flash-lite",  # Rank 4: Lightweight backup
+    "gemini-3.8-flash",       # Rank 5: 20 req/day cap backup
 ]
 
 MODEL_ALIASES = {
-    "auto": "gemini-2.5-flash",
-    "default": "gemini-2.5-flash",
-    "gemini-flash-latest": "gemini-2.5-flash",
-    "gemini-2.5-flash": "gemini-2.5-flash",
-    "gemini-2.5-flash-lite": "gemini-2.5-flash-lite",
-    "gemini-2.0-flash": "gemini-2.0-flash",
-    "gemini-2.0-flash-lite": "gemini-2.0-flash-lite",
-    "gemini-1.5-flash": "gemini-2.0-flash-lite",
+    "auto": "gemini-3.5-flash",
+    "default": "gemini-3.5-flash",
+    "gemini-flash-latest": "gemini-3.5-flash",
+    "gemini-2.5-flash": "gemini-3.5-flash",
+    "gemini-2.5-flash-lite": "gemini-3.5-flash-lite",
+    "gemini-2.0-flash": "gemini-3.5-flash",
+    "gemini-2.0-flash-lite": "gemini-3.5-flash-lite",
+    "gemini-1.5-flash": "gemini-3.1-flash-lite",
 }
 
 class KarakalpakTranslator:
