@@ -10,8 +10,11 @@ from pathlib import Path
 from typing import List, Tuple
 
 # Vowel classifications according to Karakalpak Phonology
-BACK_VOWELS = set("aıouAIOUá")      # Juwan dawıslılar (a, ı, o, u)
-FRONT_VOWELS = set("eióúeiÓÚEİ")    # Jińishke dawıslılar (e, i, ó, ú, á)
+from app.phonetics_engine import (
+    buwinga_bol, juwan_buwinba, ashiq_buwinba, tuyiq_buwinba,
+    qamaw_buwinba, aqirgi_ses, aqirgi_buwin_unlime, jalga_seplik,
+    BACK_VOWEL_SET as BACK_VOWELS, FRONT_VOWEL_SET as FRONT_VOWELS
+)
 
 # Consonant classifications
 VOICELESS_CONSONANTS = set("ptkqsşshchxíPTKQSŞSHCHX") # Qatań dawıssızlar (p, t, k, q, s, sh, ch, x, f)
